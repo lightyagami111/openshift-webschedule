@@ -45,6 +45,7 @@
             <div class="panel-heading">
                 <span class="selected_view"></span>
                 <span class="selected_grouping"></span>
+                <input type="hidden" class="selected_grouping_id" value=""/>
                 <span class="newTaskButtonsPosition">
                     <a href="#" class="btn btn-default" role="button"><span action="newTaskToRoot" class="glyphicon glyphicon-plus">R</span></a>
                     <a href="#" class="btn btn-default" role="button"><span action="newSubTask" class="glyphicon glyphicon-plus">S</span></a>

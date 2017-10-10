@@ -14,7 +14,7 @@ import java.util.Set;
  * @author ivaylo
  */
 
-public class LabelTaskDTO {
+public class TaskTreeDTO {
     
     private Long id;
     
@@ -26,6 +26,7 @@ public class LabelTaskDTO {
     private String notes;
     private Date start;
     private Date end;
+    private Boolean allDay;
     private Set<LabelEntity> labels = new HashSet<>();
     private Set<LinkEntity> links = new HashSet<>();
     private Integer priority;
@@ -117,6 +118,13 @@ public class LabelTaskDTO {
     public void setPriority(Integer priority) {
         this.priority = priority;
     }
-    
+
+    public Boolean getAllDay() {
+        return allDay;
+    }
+
+    public void setAllDay(Boolean allDay) {
+        this.allDay = allDay;
+    }
     
 }

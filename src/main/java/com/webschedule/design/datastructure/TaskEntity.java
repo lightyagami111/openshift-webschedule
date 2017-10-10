@@ -18,7 +18,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
-import javax.persistence.Transient;
 
 /**
  *
@@ -56,8 +55,6 @@ public class TaskEntity implements Serializable {
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<LinkEntity> links = new HashSet<>();
     
-    @Transient
-    private Set<TaskEntity> subTasks = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -89,6 +86,10 @@ public class TaskEntity implements Serializable {
 
     public void setParent_text(String parent_text) {
         this.parent_text = parent_text;
+    }
+
+    public ProjectEntity getProject() {
+        return project;
     }
 
     public void setProject(ProjectEntity project) {
@@ -161,15 +162,6 @@ public class TaskEntity implements Serializable {
 
     public void setPriority(Integer priority) {
         this.priority = priority;
-    }
-
-    public Set<TaskEntity> getSubTasks() {
-        return subTasks;
-    }
-
-    public void setSubTasks(Set<TaskEntity> subTasks) {
-        this.subTasks = subTasks;
-    }
-    
+    }    
     
 }

@@ -116,23 +116,8 @@
                     </div>
 
                     <div class="row">
-                        <div class="col-lg-4 width44">
-                            <div class="panel panel-default">
-                                <div class="panel-heading">
-                                    <span class="selected_view"></span>
-                                    <span class="selected_grouping"></span>
-                                    <span class="newTaskButtonsPosition">
-                                        <a href="#" class="btn btn-default" role="button"><span id="newTaskToRoot" class="glyphicon glyphicon-plus">R</span></a>
-                                        <a href="#" class="btn btn-default" role="button"><span id="newSubTask" class="glyphicon glyphicon-plus">S</span></a>
-                                        <a href="#" class="btn btn-default" role="button"><span id="newTaskToSameLevel" class="glyphicon glyphicon-plus">L</span></a>
-                                    </span>                                      
-                                </div>
-                                <div  style="overflow-x: auto; white-space: nowrap;">
-                                    <div class="panel-body" id="taks_list" style="display: inline-block; float: none;">
-
-                                    </div>
-                                </div>                                
-                            </div>
+                        <div class="col-lg-4 width44" id="tasks_list_content">
+                            
                         </div>
                         <!-- /.col-lg-4 -->
                         <div class="col-lg-4 width44" id="ts_info">

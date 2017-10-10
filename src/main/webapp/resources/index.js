@@ -7,8 +7,6 @@ $(document).ready(function () {
         loadProjectsMenu(data_projects);
         loadEditTaskProjects(data_projects);
     });
-    
-    loadTasksLists();
 
     loadLabels(function (result) {
         loadLabelsAjaxCallback(result);

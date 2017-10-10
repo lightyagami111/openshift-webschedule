@@ -156,6 +156,10 @@ public class DaoService {
     public List<TaskEntity> loadTasksByProject(Long project_id) {
         return getCurrentSession().createQuery("SELECT p FROM TaskEntity p WHERE p.project.id = :_id").setParameter("_id", project_id).list();
     }
+    
+    public Long countTasksById(Long project_id) {
+        return (Long) getCurrentSession().createQuery("SELECT COUNT(*) FROM TaskEntity p WHERE p.project.id = :_id").setParameter("_id", project_id).uniqueResult();
+    }
 
     public List<TaskEntity> loadTaskByLabel(Long label_id) {
         return getCurrentSession().createQuery("SELECT p FROM TaskEntity p JOIN p.labels pl WHERE pl.id = :_id").setParameter("_id", label_id).list();
