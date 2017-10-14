@@ -27,7 +27,7 @@ function refreshData() {
     hideTaskInfo();
 
     if (view === 'projects') {
-        loadTasksByProject(value, refreshTasksListsCallback);
+        loadTasksByProjectByGroup(value, refreshTasksListsCallback);
     } else if (view === 'labels') {
         loadTasksByLabel(value, refreshTasksListsCallback);
     } else if (view === 'calendar') {

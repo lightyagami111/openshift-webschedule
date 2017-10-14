@@ -40,7 +40,7 @@ public class GroupAndSortService {
             selectedGS.setSelectedView(view);
             selectedGS.setSelectedId(id);
             selectedGS.setGroup_("dont-group");
-            selectedGS.setSort_("sort-sdate-up");
+            selectedGS.setSort_("dont-sort");
         }
         return selectedGS;
     }

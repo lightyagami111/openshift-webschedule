@@ -15,6 +15,7 @@ public class GroupSortFromLabelDTO {
     
     private List<GroupSortDTO> groups;
     private LabelEntity e;
+    private boolean bindNewTaskAction;
 
     public List<GroupSortDTO> getGroups() {
         return groups;
@@ -30,6 +31,14 @@ public class GroupSortFromLabelDTO {
 
     public void setE(LabelEntity e) {
         this.e = e;
+    }
+    
+    public boolean getBindNewTaskAction() {
+        return bindNewTaskAction;
+    }
+
+    public void setBindNewTaskAction(boolean bindNewTaskAction) {
+        this.bindNewTaskAction = bindNewTaskAction;
     }
     
 }

@@ -87,6 +87,20 @@ function loadTasksByProject(project_id, callback) {
     });
 }
 
+function loadTasksByProjectByGroup(project_id, callback) {
+    jQuery.ajax({
+        type: "GET",
+        url: '/WebSchedule/loadTasksByProject/group',
+        data: "id=" + project_id,
+        success: function (result) {
+            callback(result);
+        },
+        error: function (xhr) {
+            errorMessage(xhr);
+        }
+    });
+}
+
 function loadTasksByLabel(label_id, callback) {
     jQuery.ajax({
         type: "GET",

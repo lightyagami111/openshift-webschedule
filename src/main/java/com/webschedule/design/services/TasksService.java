@@ -46,7 +46,7 @@ public class TasksService {
         if (gs.getGroup_().equals("group-label")) {
             LabelEntity noGroup = new LabelEntity();
             noGroup.setId(null);
-            noGroup.setText("no-group");
+            noGroup.setText("");
             Map<LabelEntity, List<TaskEntity>> map = new HashMap<>();
             for (TaskEntity task : tasks) {
                 if (task.getLabels() != null && !task.getLabels().isEmpty()) {
@@ -74,15 +74,16 @@ public class TasksService {
                 List<TaskEntity> value = entry.getValue();
                 GroupSortDTO groupProjectTasksDTO = new GroupSortDTO();
                 groupProjectTasksDTO.setGroupBy(key.getText());
-                groupProjectTasksDTO.setGroupById(String.valueOf(key.getId()));
 
                 List<TaskTreeDTO> list = new ArrayList<>();
                 for (TaskEntity taskEntity : value) {
-                    list.addAll(taskEntityToTree(taskEntity, false));
+                    list.add(taskEntityToTree(taskEntity));
                 }
+                SortUtil.sortTasks(gs, list);
                 groupProjectTasksDTO.setTasks(list);
                 result.add(groupProjectTasksDTO);
             }
+            SortUtil.sortGroups(gs, result);
             
         } 
         
@@ -102,18 +103,19 @@ public class TasksService {
                 List<TaskEntity> value = entry.getValue();
                 GroupSortDTO groupProjectTasksDTO = new GroupSortDTO();
                 groupProjectTasksDTO.setGroupBy(key.getText());
-                groupProjectTasksDTO.setGroupById(String.valueOf(key.getId()));
                 
                 List<TaskTreeDTO> list = new ArrayList<>();
                 for (TaskEntity taskEntity : value) {
-                    list.addAll(taskEntityToTree(taskEntity, false));
+                    list.add(taskEntityToTree(taskEntity));
                 }
+                SortUtil.sortTasks(gs, list);
                 groupProjectTasksDTO.setTasks(list);
                 result.add(groupProjectTasksDTO);
             }
+            SortUtil.sortGroups(gs, result);
         }
         
-        else if (gs.getGroup_().equals("group-sdate")) {
+        else if (gs.getGroup_().startsWith("group-sdate")) {
             Map<String, List<TaskEntity>> map = new HashMap<>();
             String noDate = "";
             for (TaskEntity task : tasks) {
@@ -137,19 +139,35 @@ public class TasksService {
 
             for (Map.Entry<String, List<TaskEntity>> entry : map.entrySet()) {
                 String key = entry.getKey();
+                if (key.equals(noDate)) {
+                    continue;
+                }
                 List<TaskEntity> value = entry.getValue();
                 GroupSortDTO groupProjectTasksDTO = new GroupSortDTO();
                 groupProjectTasksDTO.setGroupBy(key);
-                groupProjectTasksDTO.setGroupById(key);
 
                 List<TaskTreeDTO> list = new ArrayList<>();
                 for (TaskEntity taskEntity : value) {
-                    list.addAll(taskEntityToTree(taskEntity, false));
+                    list.add(taskEntityToTree(taskEntity));
+                }
+                SortUtil.sortTasks(gs, list);
+                groupProjectTasksDTO.setTasks(list);
+                result.add(groupProjectTasksDTO);
+            }
+            SortUtil.sortGroups(gs, result);
+            //noDate
+            List<TaskEntity> value = map.get(noDate);
+            if (value != null) {
+                GroupSortDTO groupProjectTasksDTO = new GroupSortDTO();
+                groupProjectTasksDTO.setGroupBy(noDate);
+
+                List<TaskTreeDTO> list = new ArrayList<>();
+                for (TaskEntity taskEntity : value) {
+                    list.add(taskEntityToTree(taskEntity));
                 }
                 groupProjectTasksDTO.setTasks(list);
                 result.add(groupProjectTasksDTO);
             }
-
         } 
         
         else { // dont-group
@@ -158,8 +176,15 @@ public class TasksService {
 
             List<TaskTreeDTO> list = new ArrayList<>();
             for (TaskEntity taskEntity : tasks) {
-                list.addAll(taskEntityToTree(taskEntity, true));
+                TaskTreeDTO taskDTO = new TaskTreeDTO();
+                Copier.copy(taskEntity, taskDTO);
+                if (!gs.getSort_().equals("dont-sort")) {
+                    taskDTO.setParent("#");
+                    taskDTO.setParent_text("");
+                }
+                list.add(taskDTO);
             }
+            SortUtil.sortTasks(gs, list);
             groupProjectTasksDTO.setTasks(list);
             result.add(groupProjectTasksDTO);
         }
@@ -169,25 +194,13 @@ public class TasksService {
 
     
     
-    public List<TaskTreeDTO> taskEntityToTree(TaskEntity loadTaskByLabel1, boolean addSubtasks) {
-        List<TaskTreeDTO> resultList = new ArrayList<>();
+    public TaskTreeDTO taskEntityToTree(TaskEntity loadTask) {
+        TaskTreeDTO taskDTO = new TaskTreeDTO();
+        Copier.copy(loadTask, taskDTO);
+        taskDTO.setParent("#");
+        taskDTO.setParent_text("");
 
-        TaskTreeDTO labelTaskDTO = new TaskTreeDTO();
-        Copier.copy(loadTaskByLabel1, labelTaskDTO);
-        labelTaskDTO.setParent("#");
-        labelTaskDTO.setParent_text("");
-        resultList.add(labelTaskDTO);
-
-        if (addSubtasks) {
-            List<TaskEntity> findAllSubtasks = daoService.findAllSubtasks(String.valueOf(loadTaskByLabel1.getId()));
-            for (TaskEntity findAllSubtask : findAllSubtasks) {
-                TaskTreeDTO labelSubTaskDTO = new TaskTreeDTO();
-                Copier.copy(findAllSubtask, labelSubTaskDTO);
-                resultList.add(labelSubTaskDTO);
-            }
-        }
-
-        return resultList;
+        return taskDTO;
     }
     
     

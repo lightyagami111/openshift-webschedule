@@ -59,7 +59,7 @@ function colorizeF(data_projects, element) {
         var project = getProjectByid_loaded(data_projects, $(element).attr('id').replace('_anchor', ''));
         var bckgColor = project.bckgColor;
         var e = $('<div class="color-box"></div>');
-        if (bckgColor !== null && bckgColor !== DEFAULT_COLOR) {
+        if (bckgColor !== null && bckgColor.toUpperCase() !== DEFAULT_COLOR) {
             e.css('background-color', bckgColor);
         }
         $(element).after(e);

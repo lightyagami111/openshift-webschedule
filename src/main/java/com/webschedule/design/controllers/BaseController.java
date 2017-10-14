@@ -109,9 +109,9 @@ public class BaseController {
     //--------------------------------------------------------------------------
     // TASKS
     //--------------------------------------------------------------------------
-    @RequestMapping(value = {"/loadTasksByProject"}, method = RequestMethod.GET)
+    @RequestMapping(value = {"/loadTasksByProject/group"}, method = RequestMethod.GET)
     public @ResponseBody
-    GroupSortFromProjectDTO loadTasksByProject(@RequestParam(value = "id") Long id) {
+    GroupSortFromProjectDTO loadTasksByProjectGroup(@RequestParam(value = "id") Long id) {
         ProjectEntity pe = daoService.findProjectById(id);
         GroupSortEntity gs = groupAndSortService.getExistingOrDefault("projects", String.valueOf(id));
         List<TaskEntity> tasks = daoService.loadTasksByProject(id);
@@ -120,8 +120,15 @@ public class BaseController {
         GroupSortFromProjectDTO result = new GroupSortFromProjectDTO();
         result.setE(pe);
         result.setGroups(groups);
+        result.setBindNewTaskAction(gs.getGroup_().equals("dont-group") && gs.getSort_().equals("dont-sort"));
         
         return result;
+    }
+    
+    @RequestMapping(value = {"/loadTasksByProject"}, method = RequestMethod.GET)
+    public @ResponseBody
+    List<TaskEntity> loadTasksByProject(@RequestParam(value = "id") Long id) {        
+        return daoService.loadTasksByProject(id);
     }
 
     @RequestMapping(value = {"/loadTasksByLabel"}, method = RequestMethod.GET)
@@ -135,6 +142,7 @@ public class BaseController {
         GroupSortFromLabelDTO result = new GroupSortFromLabelDTO();
         result.setE(le);
         result.setGroups(groups);
+        result.setBindNewTaskAction(gs.getGroup_().equals("dont-group") && gs.getSort_().equals("dont-sort"));
 
         return result;
     }

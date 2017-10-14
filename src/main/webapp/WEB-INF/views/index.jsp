@@ -96,7 +96,8 @@
                                     <ul class="dropdown-menu ulGroup">
                                         <li><a href="#">Project <span id="group-project" class="gsli glyphicon" aria-hidden="true"></span></a></li>
                                         <li><a href="#">Label <span id="group-label" class="gsli glyphicon" aria-hidden="true"></span></a></li>
-                                        <li><a href="#">Start date/time <span id="group-sdate" class="gsli glyphicon" aria-hidden="true"></span></a></li>
+                                        <li><a href="#"><span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span> Start date/time <span id="group-sdate-up" class="gsli glyphicon" aria-hidden="true"></span></a></li>
+                                        <li><a href="#"><span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span> Start date/time <span id="group-sdate-down" class="gsli glyphicon" aria-hidden="true"></span></a></li>
                                         <li class="divider"></li>
                                         <li><a href="#">Don't group <span id="dont-group" class="gsli glyphicon" aria-hidden="true"></span></a></li>
                                     </ul>
@@ -104,10 +105,12 @@
                                 <div class="btn-group gs">
                                     <button class="btn dropdown-toggle" data-toggle="dropdown"><span id="" class="fa fa-sort"></span> Sort <span class="caret"></span></button>
                                     <ul class="dropdown-menu ulSort">
-                                        <li><a href="#"><span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span> Start date/time <span id="sort-sdate-up" class="gsli glyphicon" aria-hidden="true"></span></a></li>
-                                        <li><a href="#"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span> Start date/time <span id="sort-sdate-down" class="gsli glyphicon" aria-hidden="true"></span></a></li>
-                                        <li><a href="#"><span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span> Priority <span id="sort-prio-up" class="gsli glyphicon" aria-hidden="true"></span></a></li>
-                                        <li><a href="#"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span> Priority <span id="sort-prio-down" class="gsli glyphicon" aria-hidden="true"></span></a></li>
+                                        <li><a href="#"><span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span> Start date/time <span id="sort-sdate-up" class="gsli glyphicon" aria-hidden="true"></span></a></li>
+                                        <li><a href="#"><span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span> Start date/time <span id="sort-sdate-down" class="gsli glyphicon" aria-hidden="true"></span></a></li>
+                                        <li><a href="#"><span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span> Priority <span id="sort-prio-up" class="gsli glyphicon" aria-hidden="true"></span></a></li>
+                                        <li><a href="#"><span class="glyphicon glyphicon-chevron-down" aria-hidden="true"></span> Priority <span id="sort-prio-down" class="gsli glyphicon" aria-hidden="true"></span></a></li>
+                                        <li class="divider"></li>
+                                        <li><a href="#">Don't sort <span id="dont-sort" class="gsli glyphicon" aria-hidden="true"></span></a></li>
                                     </ul>
                                 </div>
                             </h1>

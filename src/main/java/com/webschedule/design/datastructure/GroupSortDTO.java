@@ -14,7 +14,6 @@ import java.util.List;
 public class GroupSortDTO {
     
     private String groupBy;
-    private String groupById;
     private List<TaskTreeDTO> tasks;
 
     public String getGroupBy() {
@@ -31,14 +30,6 @@ public class GroupSortDTO {
 
     public void setTasks(List<TaskTreeDTO> tasks) {
         this.tasks = tasks;
-    }
-
-    public String getGroupById() {
-        return groupById;
-    }
-
-    public void setGroupById(String groupById) {
-        this.groupById = groupById;
     }
     
     

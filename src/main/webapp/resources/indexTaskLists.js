@@ -1,42 +1,22 @@
-var data1 = [
-    {
-        view: 'inbox',
-        groupBy : 'LAB 1',
-        groupById : 1,
-        tasks: [
-            {id: 1, text: 'task 1', parent: '#'},
-            {id: 2, text: 'task 2', parent: '#'}
-        ]
-    },
-    {
-        view: 'inbox',
-        groupBy : 'LAB 2',
-        groupById : 2,
-        tasks: [
-            {id: 3, text: 'task 3', parent: '#'},
-            {id: 4, text: 'task 4', parent: '3'}
-        ]
-    }
-];
 var task_list_template = $('#tasks_list_template').html();
 
 function refreshTasksListsCallback(result) {
     $('#tasks_list_content').html('');
     var groups = result.groups;
     var view = result.e.text;
+    var bindNewTaskAction = result.bindNewTaskAction;
     for (var i = 0; i < groups.length; i++) {
         var d1 = groups[i];
         var thtml = $(task_list_template);
-        thtml.find('.selected_grouping').text(d1.groupBy);        
-        thtml.find('.selected_grouping_id').val(d1.groupById);
-        loadJsTree(thtml, d1.tasks);
+        thtml.find('.selected_grouping').text(d1.groupBy);
+        loadJsTree(thtml, d1.tasks, bindNewTaskAction);
         $('#tasks_list_content').append(thtml);
     }
     $('#tasks_list_content').find('.selected_view').text(view);
 
 }
 
-function loadJsTree(thtml, data_tasks) {
+function loadJsTree(thtml, data_tasks, bindNewTaskAction) {
     var jstreeImpl = thtml.find('div[action="taks_list"]');
     jstreeImpl.jstree({
         core: {
@@ -67,15 +47,21 @@ function loadJsTree(thtml, data_tasks) {
         jstreeImpl.jstree(true).open_all();
     });
 
-    thtml.find('span[action="newTaskToRoot"]').on('click', function () {
-        newTaskToRoot(jstreeImpl);
-    });
-    thtml.find('span[action="newSubTask"]').on('click', function () {
-        newSubTask(jstreeImpl);
-    });
-    thtml.find('span[action="newTaskToSameLevel"]').on('click', function () {
-        newTaskToSameLevel(jstreeImpl);
-    });
+    if (bindNewTaskAction === true) {
+        thtml.find('.newTaskButtonsPosition').show();
+        thtml.find('a[action="newTaskToRoot"]').on('click', function () {
+            newTaskToRoot(jstreeImpl);
+        });
+        thtml.find('a[action="newSubTask"]').on('click', function () {
+            newSubTask(jstreeImpl);
+        });
+        thtml.find('a[action="newTaskToSameLevel"]').on('click', function () {
+            newTaskToSameLevel(jstreeImpl);
+        });
+    }
+    else {
+        thtml.find('.newTaskButtonsPosition').hide();
+    }
 }
 
 
@@ -91,16 +77,16 @@ function newTaskToRoot(jstreeImpl, parent_id) {
 }
 
 function newSubTask(jstreeImpl) {
-    if ($("#taks_list").jstree("get_selected").length > 0) {
-        newTaskToRoot(jstreeImpl, $("#taks_list").jstree("get_selected")[0]);
+    if (jstreeImpl.jstree("get_selected").length > 0) {
+        newTaskToRoot(jstreeImpl, jstreeImpl.jstree("get_selected")[0]);
     } else {
         newTaskToRoot(jstreeImpl, null);
     }
 }
 
 function newTaskToSameLevel(jstreeImpl) {
-    if ($("#taks_list").jstree("get_selected").length > 0) {
-        newTaskToRoot(jstreeImpl, jstreeImpl.jstree("get_parent", $("#taks_list").jstree("get_selected")[0]));
+    if (jstreeImpl.jstree("get_selected").length > 0) {
+        newTaskToRoot(jstreeImpl, jstreeImpl.jstree("get_parent", jstreeImpl.jstree("get_selected")[0]));
     } else {
         newTaskToRoot(jstreeImpl, null);
     }
