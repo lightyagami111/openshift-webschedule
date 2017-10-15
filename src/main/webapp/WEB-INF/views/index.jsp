@@ -35,13 +35,7 @@
         <div id="wrapper">
             <!-- Navigation -->
             <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0;">
-                <div class="navbar-header">
-                    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                        <span class="sr-only">Toggle navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
+                <div class="navbar-header">                    
                     <div class="sidebar-search">
                         <div class="input-group custom-search-form">
                             <input type="text" class="form-control" placeholder="Search...">
@@ -55,10 +49,15 @@
                     </div>
                 </div>
 
-                <ul class="nav navbar-top-links navbar-right">                    
+                <ul class="nav navbar-top-links navbar-right">      
+                    <li>
+                        <a role="button" class="btn" data-toggle="collapse" data-target=".navbar-collapse" id="mobileMenuButton">
+                            <i class="fa fa-bars fa-fw"></i>
+                        </a>
+                    </li>
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
-                            <i class="fa fa-tasks fa-fw"></i> <i class="fa fa-caret-down"></i>
+                            <i class="fa fa-gg fa-fw"></i> <i class="fa fa-caret-down"></i>
                         </a>
                         <ul class="dropdown-menu" id="sch_labels">
 
@@ -66,7 +65,7 @@
                     </li>
 
                     <li>
-                        <a href="#" class="btn btn-default" role="button" id="showCalendar">
+                        <a href="#" class="btn" role="button" id="showCalendar">
                             <i class="fa fa-bell fa-fw"></i>
                         </a> 
                     </li>                
@@ -91,7 +90,7 @@
                     <div class="row">
                         <div class="col-lg-12">
                             <h1 class="page-header">                                                          
-                                <div class="btn-group gs">
+                                <div class="btn-group dropdown gs">
                                     <button class="btn dropdown-toggle" data-toggle="dropdown"><span id="" class="fa fa-group"></span> Group <span class="caret"></span></button>
                                     <ul class="dropdown-menu ulGroup">
                                         <li><a href="#">Project <span id="group-project" class="gsli glyphicon" aria-hidden="true"></span></a></li>
@@ -102,7 +101,7 @@
                                         <li><a href="#">Don't group <span id="dont-group" class="gsli glyphicon" aria-hidden="true"></span></a></li>
                                     </ul>
                                 </div>
-                                <div class="btn-group gs">
+                                <div class="btn-group dropdown gs">
                                     <button class="btn dropdown-toggle" data-toggle="dropdown"><span id="" class="fa fa-sort"></span> Sort <span class="caret"></span></button>
                                     <ul class="dropdown-menu ulSort">
                                         <li><a href="#"><span class="glyphicon glyphicon-chevron-up" aria-hidden="true"></span> Start date/time <span id="sort-sdate-up" class="gsli glyphicon" aria-hidden="true"></span></a></li>
@@ -120,7 +119,7 @@
 
                     <div class="row">
                         <div class="col-lg-4 width44" id="tasks_list_content">
-                            
+
                         </div>
                         <!-- /.col-lg-4 -->
                         <div class="col-lg-4 width44" id="ts_info">
@@ -186,15 +185,15 @@
 
         <script src="resources/main.js?1118"></script>
         <script src="resources/dbmng.js?1122"></script>
-        <script src="resources/index.js?1587"></script>
+        <script src="resources/index.js?1593"></script>
         <script src="resources/indexDateTimePicker.js?1574"></script>
         <script src="resources/indexEditLink.js?1574"></script>
         <script src="resources/indexEditTaskLabels.js?1574"></script>
         <script src="resources/indexEditTaskParent.js?1574"></script>
         <script src="resources/indexEditTaskProjects.js?1574"></script>
-        <script src="resources/indexGroupAndSort.js?1574"></script>
+        <script src="resources/indexGroupAndSort.js?1575"></script>
         <script src="resources/indexProjectsMenu.js?1574"></script>        
         <script src="resources/indexTaskLists.js?1574"></script>
-        
+
     </body>
 </html>

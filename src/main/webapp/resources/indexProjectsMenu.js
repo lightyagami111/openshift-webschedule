@@ -10,7 +10,7 @@ function loadProjectsMenu(data_projects) {
             'data': data_projects
         }
     });
-    
+
     $('#side-menu').on("select_node.jstree", function (e, data) {
         var project_id = data.node.id;
         var project_title = data.node.text;
@@ -24,46 +24,48 @@ function loadProjectsMenu(data_projects) {
         setGroupAndSort();
         refreshData();
     });
-    
+
     $('#side-menu').on('loaded.jstree', function () {
         ($(this)).jstree('open_all');
-        $('#side-menu li a').each(function (index, element) {
-            colorizeF(data_projects, element);
-        });
+        colorizefIterate(data_projects);
     });
-    
+
     $('#side-menu').on('open_node.jstree', function () {
-        $('#side-menu li a').each(function (index, element) {
-            colorizeF(data_projects, element);
-        });
+        colorizefIterate(data_projects);
     });
-    
-    
-    
-    
-    
+
+
+
+
+
     if (mobileCheck() === false) {
         $('.sidebar').css({
             'width': '400px'
         });
+        $('#mobileMenuButton').hide();
     }
 
 }
 
 
 
+function colorizefIterate(data_projects) {
+    $('#side-menu li').each(function (index, element) {
+        colorizeF(data_projects, element);
+    });
+}
 
 
 function colorizeF(data_projects, element) {
-    if ($(element).find('.color-box').length === 0) {
-        var project = getProjectByid_loaded(data_projects, $(element).attr('id').replace('_anchor', ''));
+    var id = $(element).attr('id');
+    var a = $(element).find('a[id="'+id+'_anchor"]');
+    if (a.hasClass('color-box-text') === false) {
+        var project = getProjectByid_loaded(data_projects, id);
         var bckgColor = project.bckgColor;
-        var e = $('<div class="color-box"></div>');
         if (bckgColor !== null && bckgColor.toUpperCase() !== DEFAULT_COLOR) {
-            e.css('background-color', bckgColor);
+            a.css('background-color', bckgColor);
         }
-        $(element).after(e);
-        $(element).addClass('color-box-text');
+        a.addClass('color-box-text');
     }
 }
 

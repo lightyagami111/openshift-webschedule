@@ -22,11 +22,6 @@
     z-index: 1; 
 }
 
-.color-box {
-    width: 13px;
-    height: 15px;
-    display: inline-block;
-}
 .color-box-text {
     font-size : 17px;
     font-weight: bolder;

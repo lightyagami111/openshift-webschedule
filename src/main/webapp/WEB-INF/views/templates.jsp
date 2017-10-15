@@ -6,6 +6,7 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <div style="display : none;">
+    
 
     <div id="link_item_template">
         <li class="list-group-item" data-id="">

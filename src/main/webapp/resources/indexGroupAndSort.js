@@ -9,15 +9,6 @@ function loadGroupAndSort() {
         disableItemSortDropdown();
         saveGroupAndSort(group, sort);
     });
-
-    if (mobileCheck() === true) {
-        $('.page-header').children().each(function () {
-            $(this).css({
-                'margin-left': '-8px'
-            });
-        });
-        $('.gs').find('.dropdown-menu').addClass('dropdown-menu-right');
-    }
     
 }
 
