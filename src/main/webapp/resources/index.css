@@ -112,3 +112,10 @@ span.fc-title, span.fc-time{
 .newTaskButtonsPosition {
     float : right;
 }
+
+
+.moreInfo {
+    font-family: verdana, sans-serif;
+    font-size: 10px;
+    margin-left: 10px;
+}

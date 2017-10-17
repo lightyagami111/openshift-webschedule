@@ -380,6 +380,15 @@ function getProjectByid_loaded(pps, project_id) {
     return p;
 }
 
+function getTaskById_loaded(task_list, task_id) {
+    var p = null;
+    for (var i = 0; i < task_list.length; i++) {
+        if (task_list[i].id == task_id) {
+            p = task_list[i];
+        }
+    }
+    return p;
+}
 
 function addNewProject(pdata, callback) {
     jQuery.ajax({

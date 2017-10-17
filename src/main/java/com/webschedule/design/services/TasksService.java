@@ -36,10 +36,10 @@ public class TasksService {
 
     @Autowired
     private DaoService daoService;
-    
+
     @Autowired
     private RepeatableService repeatableService;
-    
+
     public List<GroupSortDTO> groupAndSort(GroupSortEntity gs, List<TaskEntity> tasks) {
         List<GroupSortDTO> result = new ArrayList<>();
 
@@ -58,8 +58,7 @@ public class TasksService {
                         value.add(task);
                         map.put(key, value);
                     }
-                }
-                else {
+                } else {
                     List<TaskEntity> value = map.get(noGroup);
                     if (value == null) {
                         value = new ArrayList<>();
@@ -72,22 +71,11 @@ public class TasksService {
             for (Map.Entry<LabelEntity, List<TaskEntity>> entry : map.entrySet()) {
                 LabelEntity key = entry.getKey();
                 List<TaskEntity> value = entry.getValue();
-                GroupSortDTO groupProjectTasksDTO = new GroupSortDTO();
-                groupProjectTasksDTO.setGroupBy(key.getText());
-
-                List<TaskTreeDTO> list = new ArrayList<>();
-                for (TaskEntity taskEntity : value) {
-                    list.add(taskEntityToTree(taskEntity));
-                }
-                SortUtil.sortTasks(gs, list);
-                groupProjectTasksDTO.setTasks(list);
-                result.add(groupProjectTasksDTO);
+                result.add(getGroupSortDTO(value, key.getText(), gs));
             }
             SortUtil.sortGroups(gs, result);
-            
-        } 
-        
-        else if (gs.getGroup_().equals("group-project")) {
+
+        } else if (gs.getGroup_().equals("group-project")) {
             Map<ProjectEntity, List<TaskEntity>> map = new HashMap<>();
             for (TaskEntity task : tasks) {
                 ProjectEntity key = task.getProject();
@@ -101,21 +89,11 @@ public class TasksService {
             for (Map.Entry<ProjectEntity, List<TaskEntity>> entry : map.entrySet()) {
                 ProjectEntity key = entry.getKey();
                 List<TaskEntity> value = entry.getValue();
-                GroupSortDTO groupProjectTasksDTO = new GroupSortDTO();
-                groupProjectTasksDTO.setGroupBy(key.getText());
-                
-                List<TaskTreeDTO> list = new ArrayList<>();
-                for (TaskEntity taskEntity : value) {
-                    list.add(taskEntityToTree(taskEntity));
-                }
-                SortUtil.sortTasks(gs, list);
-                groupProjectTasksDTO.setTasks(list);
-                result.add(groupProjectTasksDTO);
+                result.add(getGroupSortDTO(value, key.getText(), gs));
             }
             SortUtil.sortGroups(gs, result);
-        }
-        
-        else if (gs.getGroup_().startsWith("group-sdate")) {
+
+        } else if (gs.getGroup_().startsWith("group-sdate")) {
             Map<String, List<TaskEntity>> map = new HashMap<>();
             String noDate = "";
             for (TaskEntity task : tasks) {
@@ -124,9 +102,8 @@ public class TasksService {
                     Calendar c = Calendar.getInstance();
                     c.setTime(task.getStart());
                     c.set(Calendar.HOUR_OF_DAY, 0);
-                    key = Utils.format(c.getTime(),"yyyy-MM-dd");                    
-                }
-                else {
+                    key = Utils.format(c.getTime(), "yyyy-MM-dd");
+                } else {
                     key = noDate;
                 }
                 List<TaskEntity> value = map.get(key);
@@ -134,7 +111,7 @@ public class TasksService {
                     value = new ArrayList<>();
                 }
                 value.add(task);
-                map.put(key, value);                
+                map.put(key, value);
             }
 
             for (Map.Entry<String, List<TaskEntity>> entry : map.entrySet()) {
@@ -143,67 +120,54 @@ public class TasksService {
                     continue;
                 }
                 List<TaskEntity> value = entry.getValue();
-                GroupSortDTO groupProjectTasksDTO = new GroupSortDTO();
-                groupProjectTasksDTO.setGroupBy(key);
-
-                List<TaskTreeDTO> list = new ArrayList<>();
-                for (TaskEntity taskEntity : value) {
-                    list.add(taskEntityToTree(taskEntity));
-                }
-                SortUtil.sortTasks(gs, list);
-                groupProjectTasksDTO.setTasks(list);
-                result.add(groupProjectTasksDTO);
+                result.add(getGroupSortDTO(value, key, gs));
             }
             SortUtil.sortGroups(gs, result);
             //noDate
             List<TaskEntity> value = map.get(noDate);
             if (value != null) {
-                GroupSortDTO groupProjectTasksDTO = new GroupSortDTO();
-                groupProjectTasksDTO.setGroupBy(noDate);
-
-                List<TaskTreeDTO> list = new ArrayList<>();
-                for (TaskEntity taskEntity : value) {
-                    list.add(taskEntityToTree(taskEntity));
-                }
-                groupProjectTasksDTO.setTasks(list);
-                result.add(groupProjectTasksDTO);
+                result.add(getGroupSortDTO(value, noDate, gs));
             }
-        } 
-        
-        else { // dont-group
-            GroupSortDTO groupProjectTasksDTO = new GroupSortDTO();
-            groupProjectTasksDTO.setGroupBy("");
 
-            List<TaskTreeDTO> list = new ArrayList<>();
-            for (TaskEntity taskEntity : tasks) {
-                TaskTreeDTO taskDTO = new TaskTreeDTO();
-                Copier.copy(taskEntity, taskDTO);
-                if (!gs.getSort_().equals("dont-sort")) {
-                    taskDTO.setParent("#");
-                    taskDTO.setParent_text("");
-                }
-                list.add(taskDTO);
-            }
-            SortUtil.sortTasks(gs, list);
-            groupProjectTasksDTO.setTasks(list);
-            result.add(groupProjectTasksDTO);
+        } else { // dont-group
+            result.add(getGroupSortDTO(tasks, "", gs));
         }
-        
+
         return result;
     }
 
-    
-    
-    public TaskTreeDTO taskEntityToTree(TaskEntity loadTask) {
+    public GroupSortDTO getGroupSortDTO(List<TaskEntity> tasks, String groupBy, GroupSortEntity gs) {
+        GroupSortDTO groupProjectTasksDTO = new GroupSortDTO();
+        groupProjectTasksDTO.setGroupBy(groupBy);
+
+        List<TaskTreeDTO> list = new ArrayList<>();
+        for (TaskEntity taskEntity : tasks) {
+            TaskTreeDTO taskDTO = taskEntityToTree(taskEntity, gs);
+
+            TaskRepeatDataEntity taskRepEntity = daoService.findRepeatDataByTaskId(taskEntity.getId());
+            if (taskRepEntity != null) {
+                taskDTO.setRep(taskRepEntity);
+                taskDTO.setRepNextFire(repeatableService.computeNextFire(taskRepEntity));
+            }
+
+            list.add(taskDTO);
+        }
+        SortUtil.sortTasks(gs, list);
+        groupProjectTasksDTO.setTasks(list);
+        return groupProjectTasksDTO;
+    }
+
+    public TaskTreeDTO taskEntityToTree(TaskEntity loadTask, GroupSortEntity gs) {
         TaskTreeDTO taskDTO = new TaskTreeDTO();
         Copier.copy(loadTask, taskDTO);
-        taskDTO.setParent("#");
-        taskDTO.setParent_text("");
+        if (!gs.getSort_().equals("dont-sort")) {
+            taskDTO.setParent("#");
+            taskDTO.setParent_text("");
+        }
 
         return taskDTO;
     }
-    
-    
+
     public TaskAndSubTasksDTO loadTaskData(Long task_id) {
         TaskEntity task = daoService.findTaskById(task_id);
         TaskAndSubTasksDTO result = new TaskAndSubTasksDTO();
@@ -217,11 +181,10 @@ public class TasksService {
             }
         }
         result.setSubTasks(new HashSet(findAllSubtasks));
-        
+
         return result;
     }
-    
-    
+
     public TaskEntity loadInitialTaskData(ProjectEntity findProjectById, String parent_id, Boolean insert, Long[] labels, Date start, Date end) {
         TaskEntity t = new TaskEntity();
         t.setProject(findProjectById);
@@ -249,9 +212,7 @@ public class TasksService {
         }
         return t;
     }
-    
-    
-    
+
     public void saveTaskData(SaveRequestTaskDTO dTO, ProjectEntity project) throws ParseException {
         TaskEntity t;
         if (dTO.getId() != null) {
@@ -297,9 +258,7 @@ public class TasksService {
             daoService.saveOrUpdate(subTask);
         }
     }
-    
-    
-    
+
     public TaskRepeatDataDTO loadTaskRepeatData(Long task_id) {
         TaskRepeatDataDTO obj = new TaskRepeatDataDTO();
 
@@ -335,14 +294,13 @@ public class TasksService {
             obj.setMode_start(Utils.format(new Date()));
         }
         obj.setDbExist(t != null);
-        
+
         return obj;
     }
-    
-    
+
     public void saveTaskRepeatData(TaskRepeatDataDTO dTO, TaskEntity task) {
         TaskRepeatDataEntity t = daoService.findRepeatDataByTaskId(dTO.getTask_id());
-        
+
         if (t == null) {
             t = new TaskRepeatDataEntity();
         } else {
@@ -368,9 +326,7 @@ public class TasksService {
 
         daoService.saveOrUpdate(t);
     }
-    
-    
-    
+
     public TaskEntity loadTaskRepeatDataCurrentEvent(Long task_id, Date start, Date end) {
         TaskEntity t = daoService.findTaskById(task_id);
         t.setId(null);
@@ -379,21 +335,18 @@ public class TasksService {
         t.setParent(String.valueOf(task_id));
         t.setParent_text(t.getText());
         t.setAllDay(daoService.findRepeatDataByTaskId(task_id).getAllDay());
-        
+
         return t;
     }
-    
-    
+
     public TaskEntity updateTaskTitle(Long id, String new_title) {
         TaskEntity t = daoService.findTaskById(id);
         t.setText(new_title);
         daoService.saveOrUpdate(t);
-        
+
         return t;
     }
-    
-    
-    
+
     public List<CalendarUIEventDTO> loadEvents(Date start, Date end) {
         List<CalendarUIEventDTO> res = new ArrayList<>();
 
@@ -442,9 +395,5 @@ public class TasksService {
 
         return res;
     }
-    
-    
-    
-    
 
 }

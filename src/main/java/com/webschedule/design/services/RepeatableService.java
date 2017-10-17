@@ -51,15 +51,15 @@ public class RepeatableService {
         List<CalendarUIEventDTO> list1 = new ArrayList<>();
 
         TaskEntity f = rep.getTask();
-        
+
         List<EventException> findEventExceptions = daoService.findEventExceptions(rep);
         List<Date> eventExceptions = Lambda.extract(findEventExceptions, Lambda.on(EventException.class).getDateException());
-        
+
 
         Date now = calculateNextInitial(rep.getMode_start(), rep);
         int count = 0;
-        
-        while (haveNext(now, count, rep)) {            
+
+        while (haveNext(now, count, rep)) {
             if (afterOrEqual(now,start) && beforeOrEqual(now,end) && !eventExceptions.contains(now)) {
                 list1.add(createCalendarUIEventDTO(now, rep, f));
             }
@@ -69,8 +69,24 @@ public class RepeatableService {
 
         return list1;
     }
-    
-    
+
+    public CalendarUIEventDTO computeNextFire(TaskRepeatDataEntity rep) {
+        TaskEntity f = rep.getTask();
+        List<EventException> findEventExceptions = daoService.findEventExceptions(rep);
+        List<Date> eventExceptions = Lambda.extract(findEventExceptions, Lambda.on(EventException.class).getDateException());
+
+        Date now = calculateNextInitial(rep.getMode_start(), rep);
+        int count = 0;
+        List<CalendarUIEventDTO> list = new ArrayList<>();
+        while (haveNext(now, count, rep) && !eventExceptions.contains(now)) {
+            list.add(createCalendarUIEventDTO(now, rep, f));
+            count++;
+            now = calculateNext(now, rep);
+        }
+        
+        return list.get(0);
+    }
+
     private CalendarUIEventDTO createCalendarUIEventDTO(Date now, TaskRepeatDataEntity rep, TaskEntity f) {
         CalendarUIEventDTO d = new CalendarUIEventDTO();
         d.setId(f.getId());
@@ -85,8 +101,8 @@ public class RepeatableService {
             if (rep.getMode_end() != null) {
                 d.setEnd(Utils.format(setMinutesAndHours(now, rep.getMode_end())));
             }
-        }    
-        
+        }
+
         return d;
     }
 
@@ -94,10 +110,10 @@ public class RepeatableService {
         boolean res = false;
 
         if (rep.getEndson().equals("on_date")) {
-            res = afterOrEqual(rep.getEndson_until(),now);
+            res = afterOrEqual(rep.getEndson_until(), now);
         } else if (rep.getEndson().equals("never")) {
             try {
-                res = afterOrEqual(Utils.parse("3333-12-31"),now);
+                res = afterOrEqual(Utils.parse("3333-12-31"), now);
             } catch (ParseException ex) {
                 Logger.getLogger(RepeatableService.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -107,10 +123,11 @@ public class RepeatableService {
 
         return res;
     }
-    
+
     private boolean afterOrEqual(Date date1, Date date2) {
         return date1.after(date2) || (date1.getTime() == date2.getTime());
     }
+
     private boolean beforeOrEqual(Date date1, Date date2) {
         return date1.before(date2) || (date1.getTime() == date2.getTime());
     }

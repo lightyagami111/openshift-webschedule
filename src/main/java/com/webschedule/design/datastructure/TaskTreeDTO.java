@@ -30,6 +30,8 @@ public class TaskTreeDTO {
     private Set<LabelEntity> labels = new HashSet<>();
     private Set<LinkEntity> links = new HashSet<>();
     private Integer priority;
+    private TaskRepeatDataEntity rep;
+    private CalendarUIEventDTO repNextFire;
 
     public Long getId() {
         return id;
@@ -126,5 +128,22 @@ public class TaskTreeDTO {
     public void setAllDay(Boolean allDay) {
         this.allDay = allDay;
     }
+
+    public TaskRepeatDataEntity getRep() {
+        return rep;
+    }
+
+    public void setRep(TaskRepeatDataEntity rep) {
+        this.rep = rep;
+    }
+
+    public CalendarUIEventDTO getRepNextFire() {
+        return repNextFire;
+    }
+
+    public void setRepNextFire(CalendarUIEventDTO repNextFire) {
+        this.repNextFire = repNextFire;
+    }
+    
     
 }

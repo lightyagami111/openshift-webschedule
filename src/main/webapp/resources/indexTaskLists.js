@@ -45,6 +45,16 @@ function loadJsTree(thtml, data_tasks, bindNewTaskAction) {
     jstreeImpl.jstree(true).refresh();
     jstreeImpl.on('refresh.jstree', function (e, data) {
         jstreeImpl.jstree(true).open_all();
+        showMoreInfoIterate(data_tasks, jstreeImpl);
+    });
+
+    jstreeImpl.on('loaded.jstree', function () {
+        ($(this)).jstree('open_all');
+        showMoreInfoIterate(data_tasks, jstreeImpl);
+    });
+
+    jstreeImpl.on('open_node.jstree', function () {
+        showMoreInfoIterate(data_tasks, jstreeImpl);
     });
 
     if (bindNewTaskAction === true) {
@@ -64,6 +74,114 @@ function loadJsTree(thtml, data_tasks, bindNewTaskAction) {
     }
 }
 
+function showMoreInfoIterate(data_tasks, jstreeImpl) {
+    jstreeImpl.find('li').each(function (index, element) {
+        showMoreInfo(data_tasks, element);
+    });
+}
+
+function showMoreInfo(data_tasks, element) {
+    var id = $(element).attr('id');
+    var a = $(element).find('a[id="' + id + '_anchor"]');
+    if ($(a).parent().find('.moreInfo').length === 0) {
+        var task = getTaskById_loaded(data_tasks, $(element).attr('id').replace('_anchor', ''));
+        if (task !== null) {
+            var m = $('<span class="moreInfo"></span>');
+            var haveAppendedText = false;
+
+
+
+            var mDate = $('<span class="moreInfoDate"></span>');
+            showMoreInfoDate(task, mDate);
+            if (mDate.text().length > 0) {
+                haveAppendedText = true;
+            }
+            else if (task.rep !== null) {
+                var repeatData = task.rep;
+                var repNextFire = task.repNextFire;
+                if (repeatData.do_repeat) {                    
+                    if (repNextFire !== null) {
+                        haveAppendedText = true;
+                        mDate.addClass('glyphicon glyphicon-registration-mark');
+                        showMoreInfoDate(repNextFire, mDate);
+                    }
+                }
+            }
+            m.append(mDate);
+
+
+
+
+            if (task.priority !== 1) {
+                var append = '';
+                if (haveAppendedText == true) {
+                    append = '&nbsp;&nbsp;|| ';
+                }
+                m.append(append + 'prio ' + task.priority);
+                haveAppendedText = true;
+            }
+
+
+
+            if (task.labels !== null) {
+                var labels_text = '';
+                for (var i = 0; i < task.labels.length; i++) {
+                    labels_text = labels_text + task.labels[i].text + ', ';
+                }
+
+                if (labels_text.length > 0) {
+                    var append = '';
+                    if (haveAppendedText == true) {
+                        append = '&nbsp;&nbsp;|| ';
+                    }
+                    m.append(append + 'labels ' + labels_text);
+                }
+            }
+
+
+
+            $(a).after(m);
+        }
+    }
+}
+
+function showMoreInfoDate(data, el) {
+    var momentFormat = 'dd DD MMM YYYY';
+    if (data.allDay === false) {
+        momentFormat = 'dd DD MMM YYYY h:mm a';
+    }
+    if (data.start !== null) {
+        var moment_start = moment(data.start);
+        el.append(moment_start.format(momentFormat));
+        if (moment_start.isBefore(moment(), 'day')) {
+            el.css({
+                'color': 'red'
+            });
+        }
+        if (moment_start.isSame(moment(), 'day')) {
+            el.css({
+                'color': 'green'
+            });
+        }
+    }
+    if (data.end !== null) {
+        var moment_start = moment(data.start);
+        var moment_end = moment(data.end);
+        el.append(' - ' + moment(data.end).format('h:mm a'));
+        if ((moment_start.isBefore(moment(), 'day') || moment_start.isSame(moment(), 'day'))
+                &&
+                (moment_end.isAfter(moment(), 'day') || moment_end.isSame(moment(), 'day'))) {
+            el.css({
+                'color': 'green'
+            });
+        }
+        if (moment_start.isBefore(moment(), 'day') && moment_end.isBefore(moment(), 'day')) {
+            el.css({
+                'color': 'red'
+            });
+        }
+    }
+}
 
 
 
