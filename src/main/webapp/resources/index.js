@@ -365,9 +365,13 @@ function loadSchDataAjaxCallback(form, taskData, repeatData, fromRepeatTaskId, f
     if (repeatData.dbExist === true) {
         form.find('.repeatTask_Modal_Button').removeClass('btn-default');
         form.find('.repeatTask_Modal_Button').addClass('btn-primary');
+        form.find('.delRTaskAll_Modal_Button').show();
+        form.find('.date_time_Modal_Button').hide();
     } else {
         form.find('.repeatTask_Modal_Button').removeClass('btn-primary');
         form.find('.repeatTask_Modal_Button').addClass('btn-default');
+        form.find('.delRTaskAll_Modal_Button').hide();
+        form.find('.date_time_Modal_Button').show();
     }
 
 
@@ -376,19 +380,14 @@ function loadSchDataAjaxCallback(form, taskData, repeatData, fromRepeatTaskId, f
     } else {
         form.find('.makeEditableCurrentTaskInfo').hide();
     }
-    if (repeatData.dbExist === true) {
-        form.find('.delRTaskAll_Modal_Button').show();
-    }
-    else {
-        form.find('.delRTaskAll_Modal_Button').hide();
-    }
+
     if ($('input[name="selectedView"]').val() === 'calendar') {
         form.find('.delRTaskCurrent_Modal_Button').show();
     } else {
         form.find('.delRTaskCurrent_Modal_Button').hide();
     }
 
-    if (taskData.id === null && $('input[name="selectedView"]').val() === 'calendar') {
+    if ($('input[name="selectedView"]').val() === 'calendar' && taskData.id === null) {
         form.find('#task_buttons').hide();
     } else {
         form.find('#task_buttons').show();
@@ -437,6 +436,7 @@ function loadSchDataAjaxCallback(form, taskData, repeatData, fromRepeatTaskId, f
 
 
     var selectizeLabels = getSelectizeLabels(form);
+    selectizeLabels.clear();
     if (taskData.labels !== null) {
         for (var i = 0; i < taskData.labels.length; i++) {
             selectizeLabels.addItem(taskData.labels[i].id, true);

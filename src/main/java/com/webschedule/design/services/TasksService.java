@@ -216,19 +216,26 @@ public class TasksService {
 
     public void saveTaskData(SaveRequestTaskDTO dTO, ProjectEntity project) throws ParseException {
         TaskEntity t;
+        Date start = Utils.parse(dTO.getStart());
+        Date end = Utils.parse(dTO.getEnd());
         if (dTO.getId() != null) {
             t = daoService.findTaskById(dTO.getId());
+            TaskRepeatDataEntity rep = daoService.findRepeatDataByTaskId(dTO.getId());
+            if (rep != null) {
+                start = null;
+                end = null;
+            }
         } else {
             t = new TaskEntity();
         }
 
         if (dTO.getFromRepeatTaskId() != null) {
             daoService.deleteCurrentEvent(dTO.getFromRepeatTaskId(), Utils.parse(dTO.getFromRepeatTaskStart()));
-        }
+        }                
 
         t.setText(dTO.getText());
-        t.setStart(Utils.parse(dTO.getStart()));
-        t.setEnd(Utils.parse(dTO.getEnd()));
+        t.setStart(start);
+        t.setEnd(end);
         t.setParent(dTO.getParent());
         t.setParent_text(dTO.getParent_text());
         t.setProject(project);

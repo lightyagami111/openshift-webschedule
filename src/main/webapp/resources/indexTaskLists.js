@@ -97,7 +97,8 @@ function showMoreInfo(data_tasks, element) {
             showMoreInfoDate(task, mDate);
             if (mDate.text().length > 0) {
                 haveAppendedText = true;
-            } else if (task.rep !== null) {
+            } 
+            if (task.rep !== null) {
                 var repNextFire = task.repNextFire;
                 if (repNextFire !== null) {
                     haveAppendedText = true;
@@ -149,31 +150,31 @@ function showMoreInfoDate(data, el) {
         momentFormat = 'dd DD MMM YYYY h:mm a';
     }
     if (data.start !== null) {
-        var moment_start = moment(data.start);
+        var moment_start = moment(data.start).local();
         el.append(moment_start.format(momentFormat));
-        if (moment_start.isBefore(moment(), 'day')) {
+        if (moment_start.isBefore(moment().local(), 'day')) {
             el.css({
                 'color': 'red'
             });
         }
-        if (moment_start.isSame(moment(), 'day')) {
+        if (moment_start.isSame(moment().local(), 'day')) {
             el.css({
                 'color': 'green'
             });
         }
     }
     if (data.end !== null) {
-        var moment_start = moment(data.start);
-        var moment_end = moment(data.end);
-        el.append(' - ' + moment(data.end).format('h:mm a'));
-        if ((moment_start.isBefore(moment(), 'day') || moment_start.isSame(moment(), 'day'))
+        var moment_start = moment(data.start).local();
+        var moment_end = moment(data.end).local();
+        el.append(' - ' + moment(data.end).local().format('h:mm a'));
+        if ((moment_start.isBefore(moment().local(), 'day') || moment_start.isSame(moment().local(), 'day'))
                 &&
-                (moment_end.isAfter(moment(), 'day') || moment_end.isSame(moment(), 'day'))) {
+                (moment_end.isAfter(moment().local(), 'day') || moment_end.isSame(moment().local(), 'day'))) {
             el.css({
                 'color': 'green'
             });
         }
-        if (moment_start.isBefore(moment(), 'day') && moment_end.isBefore(moment(), 'day')) {
+        if (moment_start.isBefore(moment().local(), 'day') && moment_end.isBefore(moment().local(), 'day')) {
             el.css({
                 'color': 'red'
             });
