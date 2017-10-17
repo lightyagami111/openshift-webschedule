@@ -5,9 +5,13 @@
  */
 package com.webschedule.design.datastructure;
 
+import com.webschedule.design.services.Utils;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -143,6 +147,19 @@ public class TaskTreeDTO {
 
     public void setRepNextFire(CalendarUIEventDTO repNextFire) {
         this.repNextFire = repNextFire;
+    }
+    
+    
+    public Date getStartComputed() {
+        Date res = start;
+        if (repNextFire != null) {
+            try {
+                res = Utils.parse(repNextFire.getStart());
+            } catch (ParseException ex) {
+                Logger.getLogger(TaskTreeDTO.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+        return res;
     }
     
     

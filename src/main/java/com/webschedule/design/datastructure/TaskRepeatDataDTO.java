@@ -21,8 +21,6 @@ public class TaskRepeatDataDTO {
     @NotNull
     private Long task_id;
     
-    private Boolean do_repeat;
-    
     @NotNull
     private String mode;
     
@@ -49,14 +47,6 @@ public class TaskRepeatDataDTO {
 
     public void setTask_id(Long task_id) {
         this.task_id = task_id;
-    }
-
-    public Boolean getDo_repeat() {
-        return do_repeat;
-    }
-
-    public void setDo_repeat(Boolean do_repeat) {
-        this.do_repeat = do_repeat;
     }
 
     public String getMode() {

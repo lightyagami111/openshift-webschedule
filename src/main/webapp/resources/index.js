@@ -369,7 +369,6 @@ function loadSchDataAjaxCallback(form, taskData, repeatData, fromRepeatTaskId, f
         form.find('.repeatTask_Modal_Button').removeClass('btn-primary');
         form.find('.repeatTask_Modal_Button').addClass('btn-default');
     }
-    form.find('input[name="repeatTrue"]').prop('checked', repeatData.do_repeat);
 
 
     if ($('input[name="selectedView"]').val() === 'calendar' && repeatData.dbExist === true) {
@@ -542,7 +541,6 @@ function saveSchData(form) {
     var content = textboxioNotes.content.get();
     taskData.notes = content;
 
-    taskData.do_repeat = form.find('input[name="repeatTrue"]').prop('checked');
 
     saveTaskData(taskData, function () {
         refreshData();
@@ -556,7 +554,6 @@ function loadRepeatSchData(task_id) {
 
 function loadRepeatSchDataAjaxCallback(repeatData) {
     $('.taskRepeat_Modal_Task_id').val(repeatData.task_id);
-    $('#repeatTrue').prop('checked', repeatData.do_repeat);
     $('.r').hide();
     $('.' + repeatData.mode).show();
     $('#repeat_options').val(repeatData.mode);
@@ -604,7 +601,6 @@ function saveRepeatSchData() {
         return;
     }
     repeatData.task_id = tid;
-    repeatData.do_repeat = $('#repeatTrue').prop('checked');
 
     var mode = null;
     if ($('.d').css('display') !== 'none') {
@@ -655,7 +651,6 @@ function saveRepeatSchData() {
     repeatData.repeat_years = $('#repeat_years').val();
 
     saveTaskRepeatData(repeatData, function () {
-        $('input[name="repeatTrue"]').prop('checked', repeatData.do_repeat);
         $('.repeatTask_Modal_Button').removeClass('btn-default');
         $('.repeatTask_Modal_Button').addClass('btn-primary');
     });

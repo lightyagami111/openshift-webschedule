@@ -29,15 +29,15 @@ public class SortUtil {
         if (!sort_.equals("dont-sort")) {
             if (sort_.equals("sort-sdate-up")) {
                 Collections.sort(list, Comparators.DATE_TASKS_UP);
-                List<TaskTreeDTO> list1 = Lambda.select(list, Lambda.having(Lambda.on(TaskTreeDTO.class).getStart(), Matchers.notNullValue()));
-                List<TaskTreeDTO> list2 = Lambda.select(list, Lambda.having(Lambda.on(TaskTreeDTO.class).getStart(), Matchers.nullValue()));
+                List<TaskTreeDTO> list1 = Lambda.select(list, Lambda.having(Lambda.on(TaskTreeDTO.class).getStartComputed(), Matchers.notNullValue()));
+                List<TaskTreeDTO> list2 = Lambda.select(list, Lambda.having(Lambda.on(TaskTreeDTO.class).getStartComputed(), Matchers.nullValue()));
                 list.clear();
                 list.addAll(list1);
                 list.addAll(list2);
             } else if (sort_.equals("sort-sdate-down")) {
                 Collections.sort(list, Comparators.DATE_TASKS_DOWN);
-                List<TaskTreeDTO> list1 = Lambda.select(list, Lambda.having(Lambda.on(TaskTreeDTO.class).getStart(), Matchers.notNullValue()));
-                List<TaskTreeDTO> list2 = Lambda.select(list, Lambda.having(Lambda.on(TaskTreeDTO.class).getStart(), Matchers.nullValue()));
+                List<TaskTreeDTO> list1 = Lambda.select(list, Lambda.having(Lambda.on(TaskTreeDTO.class).getStartComputed(), Matchers.notNullValue()));
+                List<TaskTreeDTO> list2 = Lambda.select(list, Lambda.having(Lambda.on(TaskTreeDTO.class).getStartComputed(), Matchers.nullValue()));
                 list.clear();
                 list.addAll(list1);
                 list.addAll(list2);
@@ -102,14 +102,14 @@ class Comparators {
         @Override
         public int compare(TaskTreeDTO o1, TaskTreeDTO o2) {
             int result = 0;
-            if (o1.getStart() == null) {
-                if (o2.getStart() != null) {
+            if (o1.getStartComputed()== null) {
+                if (o2.getStartComputed() != null) {
                     result = -1;
                 }
-            } else if (o2.getStart() == null) {
+            } else if (o2.getStartComputed() == null) {
                 result = 1;
             } else {
-                result = o1.getStart().compareTo(o2.getStart());
+                result = o1.getStartComputed().compareTo(o2.getStartComputed());
             }
             return result;
         }
@@ -119,14 +119,14 @@ class Comparators {
         @Override
         public int compare(TaskTreeDTO o1, TaskTreeDTO o2) {
             int result = 0;
-            if (o1.getStart() == null) {
-                if (o2.getStart() != null) {
+            if (o1.getStartComputed() == null) {
+                if (o2.getStartComputed() != null) {
                     result = 1;
                 }
-            } else if (o2.getStart() == null) {
+            } else if (o2.getStartComputed() == null) {
                 result = -1;
             } else {
-                result = o2.getStart().compareTo(o1.getStart());
+                result = o2.getStartComputed().compareTo(o1.getStartComputed());
             }
             return result;
         }

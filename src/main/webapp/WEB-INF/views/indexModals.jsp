@@ -258,20 +258,6 @@
             <div class="modal-body">
                 <input type="hidden" class="taskRepeat_Modal_Task_id" value="">
 
-                <div class="[ form-group ]">
-                    <input type="checkbox" name="repeatTrue" id="repeatTrue" autocomplete="off" />
-                    <div class="[ btn-group ]">
-                        <label for="repeatTrue" class="[ btn btn-default ]">
-                            <span class="[ glyphicon glyphicon-ok ]"></span>
-                            <span> </span>
-                        </label>
-                        <label for="repeatTrue" class="[ btn btn-default active ]">
-                            repeat
-                        </label>
-                    </div>
-                </div>
-                <br>
-
                 <label for="sel1">Repeats mode:</label>
                 <select class="form-control" id="repeat_options">
                     <option value="d">Daily</option>

@@ -14,6 +14,9 @@ function refreshTasksListsCallback(result) {
     }
     $('#tasks_list_content').find('.selected_view').text(view);
 
+    $('#tasks_list_content').find('.selected_sorting').html(getSortingText());
+    $('#tasks_list_content').find('.selected_grouping_id').html(getGroupingText());
+
 }
 
 function loadJsTree(thtml, data_tasks, allowNewTaskAction) {
@@ -68,8 +71,7 @@ function loadJsTree(thtml, data_tasks, allowNewTaskAction) {
         thtml.find('a[action="newTaskToSameLevel"]').on('click', function () {
             newTaskToSameLevel(jstreeImpl);
         });
-    }
-    else {
+    } else {
         thtml.find('.newTaskButtonsPosition').hide();
     }
 }
@@ -95,16 +97,12 @@ function showMoreInfo(data_tasks, element) {
             showMoreInfoDate(task, mDate);
             if (mDate.text().length > 0) {
                 haveAppendedText = true;
-            }
-            else if (task.rep !== null) {
-                var repeatData = task.rep;
+            } else if (task.rep !== null) {
                 var repNextFire = task.repNextFire;
-                if (repeatData.do_repeat) {                    
-                    if (repNextFire !== null) {
-                        haveAppendedText = true;
-                        mDate.addClass('glyphicon glyphicon-registration-mark');
-                        showMoreInfoDate(repNextFire, mDate);
-                    }
+                if (repNextFire !== null) {
+                    haveAppendedText = true;
+                    mDate.addClass('glyphicon glyphicon-registration-mark');
+                    showMoreInfoDate(repNextFire, mDate);
                 }
             }
             m.append(mDate);

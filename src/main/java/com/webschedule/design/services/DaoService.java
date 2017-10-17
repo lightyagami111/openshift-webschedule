@@ -204,8 +204,8 @@ public class DaoService {
         getCurrentSession().saveOrUpdate(t);
     }
 
-    public List<TaskRepeatDataEntity> findRepeatableTasks(Boolean doRepeat) {
-        return getCurrentSession().createQuery("SELECT p FROM TaskRepeatDataEntity p WHERE p.do_repeat = :_doRepeat").setParameter("_doRepeat", doRepeat).list();
+    public List<TaskRepeatDataEntity> findRepeatableTasks() {
+        return getCurrentSession().createQuery("SELECT p FROM TaskRepeatDataEntity p").list();
     }
 
     public void deleteCurrentEvent(Long task_id, Date date) {

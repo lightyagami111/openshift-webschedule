@@ -25,7 +25,6 @@ public class SaveRequestTaskDTO implements Serializable {
     private Long[] labels;
     private Integer priority;
     private Boolean allDay;
-    private Boolean do_repeat;
     private Long fromRepeatTaskId;
     private String fromRepeatTaskStart;
 
@@ -123,14 +122,6 @@ public class SaveRequestTaskDTO implements Serializable {
 
     public void setAllDay(Boolean allDay) {
         this.allDay = allDay;
-    }
-
-    public Boolean getDo_repeat() {
-        return do_repeat;
-    }
-
-    public void setDo_repeat(Boolean do_repeat) {
-        this.do_repeat = do_repeat;
     }
 
     public Long getFromRepeatTaskId() {

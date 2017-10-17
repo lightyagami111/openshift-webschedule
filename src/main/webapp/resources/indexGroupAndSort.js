@@ -6,6 +6,11 @@ function loadGroupAndSort() {
         
         var group = $('.ulGroup').find('.glyphicon-ok-circle').attr('id');
         var sort = $('.ulSort').find('.glyphicon-ok-circle').attr('id');
+        if (group.startsWith('group-sdate') && sort.startsWith('sort-sdate')) {
+            sort = 'dont-sort';
+            $('.ulSort').children().find('.gsli').removeClass('glyphicon-ok-circle');
+            $('#' + sort).addClass('glyphicon-ok-circle');
+        }
         disableItem();
         saveGroupAndSort(group, sort);
     });
@@ -55,4 +60,32 @@ function saveGroupAndSort(group_, sort_) {
     }, function () {
         refreshData();
     });
+}
+
+function getSortingText() {
+    var res = '';
+    var selected = $('.ulSort').find('.glyphicon-ok-circle');
+    var sort = selected.attr('id');
+    if (sort !== 'dont-sort') {
+        $('#qwe_temp').html('');
+        res = $('#qwe_temp').append(selected.parent().find('span:first-child').clone()).html() + selected.parent().text();
+    }
+    return res;
+}
+
+function getGroupingText() {
+    var res = '';
+    var selected = $('.ulGroup').find('.glyphicon-ok-circle');
+    var group = selected.attr('id');
+    if (group !== 'dont-group') {
+        $('#qwe_temp').html('');
+        if (group.startsWith('group-sdate')) {
+            res = $('#qwe_temp').append(selected.parent().find('span:first-child').clone()).html() + selected.parent().text();
+        }
+        else {
+            res = selected.parent().text();
+        }
+        
+    }
+    return res;
 }

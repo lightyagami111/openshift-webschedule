@@ -31,8 +31,6 @@ public class TaskRepeatDataEntity implements Serializable {
     @OneToOne
     private TaskEntity task;
     
-    private Boolean do_repeat;
-    
     private String mode;
     
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
@@ -67,14 +65,6 @@ public class TaskRepeatDataEntity implements Serializable {
 
     public void setTask(TaskEntity task) {
         this.task = task;
-    }
-
-    public Boolean getDo_repeat() {
-        return do_repeat;
-    }
-
-    public void setDo_repeat(Boolean do_repeat) {
-        this.do_repeat = do_repeat;
     }
 
     public String getMode() {

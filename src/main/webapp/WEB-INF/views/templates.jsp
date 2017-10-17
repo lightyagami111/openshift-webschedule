@@ -46,6 +46,8 @@
             <div class="panel-heading">
                 <span class="selected_view"></span>
                 <span class="selected_grouping"></span>
+                <span class="selected_grouping_id"></span>
+                <span class="selected_sorting"></span>                
                 <span class="newTaskButtonsPosition">
                     <a href="#" class="btn btn-default" role="button" action="newTaskToRoot"><span class="glyphicon glyphicon-plus">R</span></a>
                     <a href="#" class="btn btn-default" role="button" action="newSubTask"><span class="glyphicon glyphicon-plus">S</span></a>
@@ -58,6 +60,10 @@
                 </div>
             </div>                                
         </div>
+    </div>
+    
+    <div id="qwe_temp">
+        
     </div>
 
 

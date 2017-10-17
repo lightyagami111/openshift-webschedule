@@ -7,8 +7,6 @@ function loadLabelsAjaxCallback(data_labels) {
         hideCalendarWrapper();
         deselectProjectMenu();
 
-        $('.selected_view').text($(this).find('strong').text());
-
         $('input[name="selectedView"]').val('labels');
         $('input[name="selectedValue"]').val($(this).attr('data-id'));
         setGroupAndSort();

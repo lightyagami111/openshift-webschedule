@@ -45,16 +45,21 @@ public class TasksService {
 
     public List<GroupSortDTO> groupAndSort(GroupSortEntity gs, List<TaskEntity> tasks) {
         List<GroupSortDTO> result = new ArrayList<>();
+        
+        List<TaskTreeDTO> tasksdto = new ArrayList<>();
+        for (TaskEntity task : tasks) {
+            tasksdto.add(taskEntityToTree(task, gs));
+        }
 
         if (gs.getGroup_().equals("group-label")) {
             LabelEntity noGroup = new LabelEntity();
             noGroup.setId(null);
             noGroup.setText("");
-            Map<LabelEntity, List<TaskEntity>> map = new HashMap<>();
-            for (TaskEntity task : tasks) {
+            Map<LabelEntity, List<TaskTreeDTO>> map = new HashMap<>();
+            for (TaskTreeDTO task : tasksdto) {
                 if (task.getLabels() != null && !task.getLabels().isEmpty()) {
                     for (LabelEntity key : task.getLabels()) {
-                        List<TaskEntity> value = map.get(key);
+                        List<TaskTreeDTO> value = map.get(key);
                         if (value == null) {
                             value = new ArrayList<>();
                         }
@@ -62,7 +67,7 @@ public class TasksService {
                         map.put(key, value);
                     }
                 } else {
-                    List<TaskEntity> value = map.get(noGroup);
+                    List<TaskTreeDTO> value = map.get(noGroup);
                     if (value == null) {
                         value = new ArrayList<>();
                     }
@@ -71,45 +76,45 @@ public class TasksService {
                 }
             }
 
-            for (Map.Entry<LabelEntity, List<TaskEntity>> entry : map.entrySet()) {
+            for (Map.Entry<LabelEntity, List<TaskTreeDTO>> entry : map.entrySet()) {
                 LabelEntity key = entry.getKey();
-                List<TaskEntity> value = entry.getValue();
+                List<TaskTreeDTO> value = entry.getValue();
                 result.add(getGroupSortDTO(value, key.getText(), gs));
             }
             SortUtil.sortGroups(gs, result);
 
         } else if (gs.getGroup_().equals("group-project")) {
-            Map<ProjectEntity, List<TaskEntity>> map = new HashMap<>();
-            for (TaskEntity task : tasks) {
+            Map<ProjectEntity, List<TaskTreeDTO>> map = new HashMap<>();
+            for (TaskTreeDTO task : tasksdto) {
                 ProjectEntity key = task.getProject();
-                List<TaskEntity> value = map.get(key);
+                List<TaskTreeDTO> value = map.get(key);
                 if (value == null) {
                     value = new ArrayList<>();
                 }
                 value.add(task);
                 map.put(key, value);
             }
-            for (Map.Entry<ProjectEntity, List<TaskEntity>> entry : map.entrySet()) {
+            for (Map.Entry<ProjectEntity, List<TaskTreeDTO>> entry : map.entrySet()) {
                 ProjectEntity key = entry.getKey();
-                List<TaskEntity> value = entry.getValue();
+                List<TaskTreeDTO> value = entry.getValue();
                 result.add(getGroupSortDTO(value, key.getText(), gs));
             }
             SortUtil.sortGroups(gs, result);
 
         } else if (gs.getGroup_().startsWith("group-sdate")) {
-            Map<String, List<TaskEntity>> map = new HashMap<>();
+            Map<String, List<TaskTreeDTO>> map = new HashMap<>();
             String noDate = "";
-            for (TaskEntity task : tasks) {
+            for (TaskTreeDTO task : tasksdto) {
                 String key;
-                if (task.getStart() != null) {
+                if (task.getStartComputed()!= null) {
                     Calendar c = Calendar.getInstance();
-                    c.setTime(task.getStart());
+                    c.setTime(task.getStartComputed());
                     c.set(Calendar.HOUR_OF_DAY, 0);
                     key = Utils.format(c.getTime(), "yyyy-MM-dd");
                 } else {
-                    key = noDate;
+                    key = noDate;                   
                 }
-                List<TaskEntity> value = map.get(key);
+                List<TaskTreeDTO> value = map.get(key);
                 if (value == null) {
                     value = new ArrayList<>();
                 }
@@ -117,44 +122,31 @@ public class TasksService {
                 map.put(key, value);
             }
 
-            for (Map.Entry<String, List<TaskEntity>> entry : map.entrySet()) {
+            for (Map.Entry<String, List<TaskTreeDTO>> entry : map.entrySet()) {
                 String key = entry.getKey();
                 if (key.equals(noDate)) {
                     continue;
                 }
-                List<TaskEntity> value = entry.getValue();
+                List<TaskTreeDTO> value = entry.getValue();
                 result.add(getGroupSortDTO(value, key, gs));
             }
             SortUtil.sortGroups(gs, result);
             //noDate
-            List<TaskEntity> value = map.get(noDate);
+            List<TaskTreeDTO> value = map.get(noDate);
             if (value != null) {
                 result.add(getGroupSortDTO(value, noDate, gs));
             }
 
         } else { // dont-group
-            result.add(getGroupSortDTO(tasks, "", gs));
+            result.add(getGroupSortDTO(tasksdto, "", gs));
         }
 
         return result;
     }
 
-    public GroupSortDTO getGroupSortDTO(List<TaskEntity> tasks, String groupBy, GroupSortEntity gs) {
+    public GroupSortDTO getGroupSortDTO(List<TaskTreeDTO> list, String groupBy, GroupSortEntity gs) {
         GroupSortDTO groupProjectTasksDTO = new GroupSortDTO();
         groupProjectTasksDTO.setGroupBy(groupBy);
-
-        List<TaskTreeDTO> list = new ArrayList<>();
-        for (TaskEntity taskEntity : tasks) {
-            TaskTreeDTO taskDTO = taskEntityToTree(taskEntity, gs);
-
-            TaskRepeatDataEntity taskRepEntity = daoService.findRepeatDataByTaskId(taskEntity.getId());
-            if (taskRepEntity != null) {
-                taskDTO.setRep(taskRepEntity);
-                taskDTO.setRepNextFire(repeatableService.computeNextFire(taskRepEntity));
-            }
-
-            list.add(taskDTO);
-        }
         SortUtil.sortTasks(gs, list);
         groupProjectTasksDTO.setTasks(list);
         return groupProjectTasksDTO;
@@ -166,6 +158,12 @@ public class TasksService {
         if (groupAndSortService.disableParent(gs)) {
             taskDTO.setParent("#");
             taskDTO.setParent_text("");
+        }
+        
+        TaskRepeatDataEntity taskRepEntity = daoService.findRepeatDataByTaskId(loadTask.getId());
+        if (taskRepEntity != null) {
+            taskDTO.setRep(taskRepEntity);
+            taskDTO.setRepNextFire(repeatableService.computeNextFire(taskRepEntity));
         }
 
         return taskDTO;
@@ -220,13 +218,6 @@ public class TasksService {
         TaskEntity t;
         if (dTO.getId() != null) {
             t = daoService.findTaskById(dTO.getId());
-
-            TaskRepeatDataEntity tr = daoService.findRepeatDataByTaskId(dTO.getId());
-            if (tr != null) {
-                tr.setDo_repeat(dTO.getDo_repeat());
-                daoService.saveOrUpdate(tr);
-            }
-
         } else {
             t = new TaskEntity();
         }
@@ -271,7 +262,6 @@ public class TasksService {
         }
 
         if (t != null) {
-            obj.setDo_repeat(t.getDo_repeat());
             obj.setEndson(t.getEndson());
             obj.setEndson_count(t.getEndson_count());
             obj.setEndson_until(Utils.format(t.getEndson_until()));
@@ -287,7 +277,6 @@ public class TasksService {
             obj.setTask_id(t.getTask().getId());
         } else {
             obj.setTask_id(task_id);
-            obj.setDo_repeat(Boolean.FALSE);
             obj.setMode("d");
             obj.setEndson("never");
             obj.setRepeat_days(1);
@@ -312,7 +301,6 @@ public class TasksService {
             }
         }
 
-        t.setDo_repeat(dTO.getDo_repeat());
         t.setEndson(dTO.getEndson());
         t.setEndson_count(dTO.getEndson_count());
         t.setEndson_until(dTO.getEndson_until());
@@ -394,7 +382,7 @@ public class TasksService {
             res.add(d);
         }
 
-        List<TaskRepeatDataEntity> findRepeatableTasks = daoService.findRepeatableTasks(Boolean.TRUE);
+        List<TaskRepeatDataEntity> findRepeatableTasks = daoService.findRepeatableTasks();
         for (TaskRepeatDataEntity findRepeatableTask : findRepeatableTasks) {
             res.addAll(repeatableService.computeFireTimesBetween(findRepeatableTask, start, end));
         }

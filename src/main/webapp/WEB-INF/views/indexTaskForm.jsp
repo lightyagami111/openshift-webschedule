@@ -33,16 +33,6 @@
         <div class="[ form-group ]">
             <button type="button" class="btn btn-primary date_time_Modal_Button" data-toggle="modal" data-target="#date_time_Modal">Date & Time</button>
             <button type="button" class="btn btn-primary repeatTask_Modal_Button" data-toggle="modal" data-target="#repeatTask_Modal">Repeat</button>
-            <input type="checkbox" name="repeatTrue" id="repeatTrue" autocomplete="off" />
-            <div class="[ btn-group ]">
-                <label for="repeatTrue" class="[ btn btn-default ]">
-                    <span class="[ glyphicon glyphicon-ok ]"></span>
-                    <span> </span>
-                </label>
-                <label for="repeatTrue" class="[ btn btn-default active ]">
-                    repeat
-                </label>
-            </div>
         </div>
 
         <br><br>
