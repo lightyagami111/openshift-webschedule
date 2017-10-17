@@ -20,7 +20,7 @@ public class GroupAndSortService {
     private DaoService daoService;
     
     
-    public void saveOrUpdate(String view, String id, String group, String sort) {
+    public GroupSortEntity saveOrUpdate(String view, String id, String group, String sort) {
         GroupSortEntity selectedGS = daoService.findGSBySelectedViewAndId(view, id);
         if (selectedGS == null) {
             selectedGS = new GroupSortEntity();
@@ -31,6 +31,8 @@ public class GroupAndSortService {
         selectedGS.setSort_(sort);
 
         daoService.saveOrUpdate(selectedGS);
+        
+        return selectedGS;
     }
     
     public GroupSortEntity getExistingOrDefault(String view, String id) {

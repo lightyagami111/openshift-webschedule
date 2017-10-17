@@ -330,7 +330,7 @@ public class TasksService {
         daoService.saveOrUpdate(t);
     }
 
-    public TaskEntity loadTaskRepeatDataCurrentEvent(Long task_id, Date start, Date end) {
+    public TaskAndSubTasksDTO loadTaskRepeatDataCurrentEvent(Long task_id, Date start, Date end) {
         TaskEntity t = daoService.findTaskById(task_id);
         t.setId(null);
         t.setStart(start);
@@ -338,8 +338,11 @@ public class TasksService {
         t.setParent(String.valueOf(task_id));
         t.setParent_text(t.getText());
         t.setAllDay(daoService.findRepeatDataByTaskId(task_id).getAllDay());
+        
+        TaskAndSubTasksDTO result = new TaskAndSubTasksDTO();
+        Copier.copy(t, result);
 
-        return t;
+        return result;
     }
 
     public TaskEntity updateTaskTitle(Long id, String new_title) {

@@ -11,7 +11,7 @@
     <button type="button" class="btn btn-sm btn-default makeEditableCurrentTaskInfo">EDIT Current</button>
     <button type="button" class="btn btn-sm btn-info delTask_Modal_Button" data-toggle="modal" data-target="#delTask_Modal">DELETE Task</button>    
     <button type="button" class="btn btn-sm btn-info delRTaskCurrent_Modal_Button" data-toggle="modal" data-target="#delRTaskCurrent_Modal">DELETE Current</button>    
-    <button type="button" class="btn btn-sm btn-info delRTaskAll_Modal_Button" data-toggle="modal" data-target="#delRTaskAll_Modal">DELETE All</button>    
+    <button type="button" class="btn btn-sm btn-info delRTaskAll_Modal_Button" data-toggle="modal" data-target="#delRTaskAll_Modal">DELETE Repeat Data</button>    
     <br><br>
 </span>
 <form class="editTask">

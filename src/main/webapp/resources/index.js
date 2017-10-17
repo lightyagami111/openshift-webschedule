@@ -373,11 +373,15 @@ function loadSchDataAjaxCallback(form, taskData, repeatData, fromRepeatTaskId, f
 
 
     if ($('input[name="selectedView"]').val() === 'calendar' && repeatData.dbExist === true) {
-        form.find('.delRTaskAll_Modal_Button').show();
         form.find('.makeEditableCurrentTaskInfo').show();
     } else {
-        form.find('.delRTaskAll_Modal_Button').hide();
         form.find('.makeEditableCurrentTaskInfo').hide();
+    }
+    if (repeatData.dbExist === true) {
+        form.find('.delRTaskAll_Modal_Button').show();
+    }
+    else {
+        form.find('.delRTaskAll_Modal_Button').hide();
     }
     if ($('input[name="selectedView"]').val() === 'calendar') {
         form.find('.delRTaskCurrent_Modal_Button').show();

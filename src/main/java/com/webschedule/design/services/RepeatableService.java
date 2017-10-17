@@ -78,13 +78,20 @@ public class RepeatableService {
         Date now = calculateNextInitial(rep.getMode_start(), rep);
         int count = 0;
         List<CalendarUIEventDTO> list = new ArrayList<>();
-        while (haveNext(now, count, rep) && !eventExceptions.contains(now)) {
-            list.add(createCalendarUIEventDTO(now, rep, f));
+        while (haveNext(now, count, rep)) {
+            if (!eventExceptions.contains(now)) {
+                list.add(createCalendarUIEventDTO(now, rep, f));
+            }            
             count++;
             now = calculateNext(now, rep);
         }
         
-        return list.get(0);
+        CalendarUIEventDTO ev = null;
+        if (!list.isEmpty()) {
+            ev = list.get(0);
+        }
+        
+        return ev;
     }
 
     private CalendarUIEventDTO createCalendarUIEventDTO(Date now, TaskRepeatDataEntity rep, TaskEntity f) {

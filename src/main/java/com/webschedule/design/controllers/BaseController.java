@@ -44,7 +44,7 @@ public class BaseController {
 
     @Autowired
     private TasksService tasksService;
-    
+
     @Autowired
     private GroupAndSortService groupAndSortService;
 
@@ -84,7 +84,7 @@ public class BaseController {
     public @ResponseBody
     ProjectEntity addNewProject(@RequestBody ProjectEntity dto) {
         daoService.persist(dto);
-        
+
         return dto;
     }
 
@@ -92,7 +92,7 @@ public class BaseController {
     public @ResponseBody
     ProjectEntity updateProject(@RequestBody ProjectEntity dto) {
         daoService.updateProject(dto);
-        
+
         return dto;
     }
 
@@ -102,7 +102,7 @@ public class BaseController {
             return new ResponseEntity(">> this project can't be deleted. Please delete project tasks first!", HttpStatus.CONFLICT);
         }
         daoService.deleteProject(id);
-        
+
         return new ResponseEntity(HttpStatus.OK);
     }
 
@@ -116,18 +116,18 @@ public class BaseController {
         GroupSortEntity gs = groupAndSortService.getExistingOrDefault("projects", String.valueOf(id));
         List<TaskEntity> tasks = daoService.loadTasksByProject(id);
         List<GroupSortDTO> groups = tasksService.groupAndSort(gs, tasks);
-        
+
         GroupSortFromProjectDTO result = new GroupSortFromProjectDTO();
         result.setE(pe);
         result.setGroups(groups);
         result.setAllowNewTaskAction(groupAndSortService.allowNewTaskAction(gs));
-        
+
         return result;
     }
-    
+
     @RequestMapping(value = {"/loadTasksByProject"}, method = RequestMethod.GET)
     public @ResponseBody
-    List<TaskEntity> loadTasksByProject(@RequestParam(value = "id") Long id) {        
+    List<TaskEntity> loadTasksByProject(@RequestParam(value = "id") Long id) {
         return daoService.loadTasksByProject(id);
     }
 
@@ -138,7 +138,7 @@ public class BaseController {
         GroupSortEntity gs = groupAndSortService.getExistingOrDefault("labels", String.valueOf(id));
         List<TaskEntity> tasks = daoService.loadTaskByLabel(id);
         List<GroupSortDTO> groups = tasksService.groupAndSort(gs, tasks);
-        
+
         GroupSortFromLabelDTO result = new GroupSortFromLabelDTO();
         result.setE(le);
         result.setGroups(groups);
@@ -149,7 +149,7 @@ public class BaseController {
 
     @RequestMapping(value = {"/loadTaskData"}, method = RequestMethod.GET)
     public @ResponseBody
-    TaskAndSubTasksDTO loadTaskData(@RequestParam(value = "id") Long id) {               
+    TaskAndSubTasksDTO loadTaskData(@RequestParam(value = "id") Long id) {
         return tasksService.loadTaskData(id);
     }
 
@@ -157,7 +157,7 @@ public class BaseController {
     public @ResponseBody
     Map getParentTaskProject(@RequestParam(value = "parent_id") Long parent_id) {
         final TaskEntity result = daoService.findTaskById(parent_id);
-        
+
         return Utils.mapOf("parent_project_id", result.getProject_id());
     }
 
@@ -176,7 +176,7 @@ public class BaseController {
             return new ResponseEntity("Default project not found (project_id=" + project_id + ")", HttpStatus.NOT_FOUND);
         }
         TaskEntity t = tasksService.loadInitialTaskData(findProjectById, parent_id, insert, labels, start, end);
-        
+
         return ResponseEntity.ok(t);
     }
 
@@ -208,7 +208,7 @@ public class BaseController {
     @RequestMapping(value = {"/saveTaskRepeatData"}, method = RequestMethod.POST)
     public @ResponseBody
     ResponseEntity saveTaskRepeatData(@RequestBody TaskRepeatDataDTO dTO) {
-        
+
         TaskEntity task = daoService.findTaskById(dTO.getTask_id());
 
         if (task == null) {
@@ -233,9 +233,10 @@ public class BaseController {
             @RequestParam(value = "start") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date start,
             @RequestParam(value = "end", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date end
     ) {
-        TaskEntity t = tasksService.loadTaskRepeatDataCurrentEvent(task_id, start, end);
+        TaskAndSubTasksDTO t = tasksService.loadTaskRepeatDataCurrentEvent(task_id, start, end);
 
-        return Utils.mapOf("taskData", t,
+        return Utils.mapOf(
+                "taskData", t,
                 "task_id", task_id,
                 "repeatTaskStart", Utils.format(start)
         );
@@ -251,20 +252,26 @@ public class BaseController {
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/deleteTaskData"}, method = RequestMethod.DELETE)
-    public void deleteTaskData(@RequestParam(value = "id") Long id) {
+    public @ResponseBody
+    ResponseEntity deleteTaskData(@RequestParam(value = "id") Long id) {
         daoService.deleteTask(id);
+        return ResponseEntity.ok(id);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/deleteRCurrentTaskData"}, method = RequestMethod.DELETE)
-    public void deleteRCurrentTaskData(@RequestParam(value = "id") Long id, @RequestParam(value = "date") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date date) {
+    public @ResponseBody
+    ResponseEntity deleteRCurrentTaskData(@RequestParam(value = "id") Long id, @RequestParam(value = "date") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date date) {
         daoService.deleteCurrentEvent(id, date);
+        return ResponseEntity.ok(id);
     }
 
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/deleteRAllTaskData"}, method = RequestMethod.DELETE)
-    public void deleteRAllTaskData(@RequestParam(value = "id") Long id) {
+    public @ResponseBody
+    ResponseEntity deleteRAllTaskData(@RequestParam(value = "id") Long id) {
         daoService.deleteTaskRepeatDataEntity(id);
+        return ResponseEntity.ok(id);
     }
 
     //--------------------------------------------------------------------------
@@ -296,10 +303,11 @@ public class BaseController {
         return dto;
     }
 
-    @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/deleteLabel"}, method = RequestMethod.DELETE)
-    public void deleteLabel(@RequestParam(value = "id") Long id) {
+    public @ResponseBody
+    ResponseEntity deleteLabel(@RequestParam(value = "id") Long id) {
         daoService.deleteLabel(id);
+        return ResponseEntity.ok(id);
     }
 
     //--------------------------------------------------------------------------
@@ -339,15 +347,16 @@ public class BaseController {
         return le;
     }
 
-    @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/link", method = RequestMethod.DELETE)
-    public void deleteLink(@RequestParam(value = "link") Long link, @RequestParam(value = "task") Long task) {
+    public @ResponseBody
+    ResponseEntity deleteLink(@RequestParam(value = "link") Long link, @RequestParam(value = "task") Long task) {
         daoService.deleteLink(link, task);
+        return ResponseEntity.ok(link);
     }
 
-    @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/link", method = RequestMethod.PUT)
-    public void updateLink(@RequestBody Map<String, Object> body) {
+    public @ResponseBody
+    ResponseEntity updateLink(@RequestBody Map<String, Object> body) {
         Long id = Long.valueOf(body.get("id").toString());
         String url = body.get("url").toString();
         String title = body.get("title").toString();
@@ -356,20 +365,21 @@ public class BaseController {
         le.setTitle(title);
         le.setUrl(url);
         daoService.updateLink(le);
+        return ResponseEntity.ok(le);
     }
 
     //--------------------------------------------------------------------------
     // GROUP && SORT 
     //--------------------------------------------------------------------------
-    @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = "/gs", method = RequestMethod.POST)
-    public void saveOrUpdateGS(@RequestBody Map<String, String> body) {
+    public @ResponseBody
+    GroupSortEntity saveOrUpdateGS(@RequestBody Map<String, String> body) {
         String view = body.get("view");
         String id = body.get("id");
         String group = body.get("group");
         String sort = body.get("sort");
 
-        groupAndSortService.saveOrUpdate(view, id, group, sort);
+        return groupAndSortService.saveOrUpdate(view, id, group, sort);
     }
 
     @RequestMapping(value = "/gs", method = RequestMethod.GET)
