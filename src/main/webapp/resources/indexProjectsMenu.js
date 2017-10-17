@@ -20,7 +20,6 @@ function loadProjectsMenu(data_projects) {
         $('.selected_view').text(project_title);
         $('input[name="selectedView"]').val('projects');
         $('input[name="selectedValue"]').val(project_id);
-        disableItemGroupDropdown();
         setGroupAndSort();
         refreshData();
     });

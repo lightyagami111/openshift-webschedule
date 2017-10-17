@@ -46,5 +46,13 @@ public class GroupAndSortService {
     }
     
     
+    public boolean allowNewTaskAction(GroupSortEntity gs) {
+        return gs.getGroup_().equals("dont-group") && gs.getSort_().equals("dont-sort");
+    }
+    
+    public boolean disableParent(GroupSortEntity gs) {
+        return !gs.getSort_().equals("dont-sort") || !gs.getGroup_().equals("dont-group") || !gs.getSelectedView().equals("projects");
+    }
+    
     
 }

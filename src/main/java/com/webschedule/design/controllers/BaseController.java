@@ -120,7 +120,7 @@ public class BaseController {
         GroupSortFromProjectDTO result = new GroupSortFromProjectDTO();
         result.setE(pe);
         result.setGroups(groups);
-        result.setBindNewTaskAction(gs.getGroup_().equals("dont-group") && gs.getSort_().equals("dont-sort"));
+        result.setAllowNewTaskAction(groupAndSortService.allowNewTaskAction(gs));
         
         return result;
     }
@@ -142,7 +142,7 @@ public class BaseController {
         GroupSortFromLabelDTO result = new GroupSortFromLabelDTO();
         result.setE(le);
         result.setGroups(groups);
-        result.setBindNewTaskAction(gs.getGroup_().equals("dont-group") && gs.getSort_().equals("dont-sort"));
+        result.setAllowNewTaskAction(groupAndSortService.allowNewTaskAction(gs));
 
         return result;
     }

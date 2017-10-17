@@ -39,6 +39,9 @@ public class TasksService {
 
     @Autowired
     private RepeatableService repeatableService;
+    
+    @Autowired
+    private GroupAndSortService groupAndSortService;
 
     public List<GroupSortDTO> groupAndSort(GroupSortEntity gs, List<TaskEntity> tasks) {
         List<GroupSortDTO> result = new ArrayList<>();
@@ -160,7 +163,7 @@ public class TasksService {
     public TaskTreeDTO taskEntityToTree(TaskEntity loadTask, GroupSortEntity gs) {
         TaskTreeDTO taskDTO = new TaskTreeDTO();
         Copier.copy(loadTask, taskDTO);
-        if (!gs.getSort_().equals("dont-sort")) {
+        if (groupAndSortService.disableParent(gs)) {
             taskDTO.setParent("#");
             taskDTO.setParent_text("");
         }

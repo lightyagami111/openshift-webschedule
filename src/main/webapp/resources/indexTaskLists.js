@@ -4,19 +4,19 @@ function refreshTasksListsCallback(result) {
     $('#tasks_list_content').html('');
     var groups = result.groups;
     var view = result.e.text;
-    var bindNewTaskAction = result.bindNewTaskAction;
+    var allowNewTaskAction = result.allowNewTaskAction;
     for (var i = 0; i < groups.length; i++) {
         var d1 = groups[i];
         var thtml = $(task_list_template);
         thtml.find('.selected_grouping').text(d1.groupBy);
-        loadJsTree(thtml, d1.tasks, bindNewTaskAction);
+        loadJsTree(thtml, d1.tasks, allowNewTaskAction);
         $('#tasks_list_content').append(thtml);
     }
     $('#tasks_list_content').find('.selected_view').text(view);
 
 }
 
-function loadJsTree(thtml, data_tasks, bindNewTaskAction) {
+function loadJsTree(thtml, data_tasks, allowNewTaskAction) {
     var jstreeImpl = thtml.find('div[action="taks_list"]');
     jstreeImpl.jstree({
         core: {
@@ -57,7 +57,7 @@ function loadJsTree(thtml, data_tasks, bindNewTaskAction) {
         showMoreInfoIterate(data_tasks, jstreeImpl);
     });
 
-    if (bindNewTaskAction === true) {
+    if (allowNewTaskAction === true) {
         thtml.find('.newTaskButtonsPosition').show();
         thtml.find('a[action="newTaskToRoot"]').on('click', function () {
             newTaskToRoot(jstreeImpl);

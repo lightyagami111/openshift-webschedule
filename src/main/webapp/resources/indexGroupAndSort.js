@@ -6,13 +6,13 @@ function loadGroupAndSort() {
         
         var group = $('.ulGroup').find('.glyphicon-ok-circle').attr('id');
         var sort = $('.ulSort').find('.glyphicon-ok-circle').attr('id');
-        disableItemSortDropdown();
+        disableItem();
         saveGroupAndSort(group, sort);
     });
     
 }
 
-function disableItemSortDropdown() {    
+function disableItem() {    
     var group = $('.ulGroup').find('.glyphicon-ok-circle').attr('id');
     if (group.startsWith("group-sdate")) {
         $('#sort-sdate-up').parents('li').hide();
@@ -22,10 +22,7 @@ function disableItemSortDropdown() {
         $('#sort-sdate-up').parents('li').show();
         $('#sort-sdate-down').parents('li').show();
     }
-}
-
-
-function disableItemGroupDropdown() {
+    
     var view = $('input[name="selectedView"]').val();
     if (view === 'projects') {
         $('#group-project').parents('li').hide();
@@ -44,7 +41,7 @@ function setGroupAndSort() {
         $('.ulSort').children().find('.gsli').removeClass('glyphicon-ok-circle');
         $('#' + result.sort_).addClass('glyphicon-ok-circle');
         $('#' + result.group_).addClass('glyphicon-ok-circle');
-        disableItemSortDropdown();
+        disableItem();
     });
 }
 function saveGroupAndSort(group_, sort_) {

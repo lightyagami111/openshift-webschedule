@@ -11,7 +11,6 @@ function loadLabelsAjaxCallback(data_labels) {
 
         $('input[name="selectedView"]').val('labels');
         $('input[name="selectedValue"]').val($(this).attr('data-id'));
-        disableItemGroupDropdown();
         setGroupAndSort();
         refreshData();
     });

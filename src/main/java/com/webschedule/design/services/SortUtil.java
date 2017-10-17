@@ -29,18 +29,18 @@ public class SortUtil {
         if (!sort_.equals("dont-sort")) {
             if (sort_.equals("sort-sdate-up")) {
                 Collections.sort(list, Comparators.DATE_TASKS_UP);
-                List<TaskTreeDTO> list1 = Lambda.select(list,Lambda.having(Lambda.on(TaskTreeDTO.class).getStart(),Matchers.notNullValue()));
-                List<TaskTreeDTO> list2 = Lambda.select(list,Lambda.having(Lambda.on(TaskTreeDTO.class).getStart(),Matchers.nullValue()));
+                List<TaskTreeDTO> list1 = Lambda.select(list, Lambda.having(Lambda.on(TaskTreeDTO.class).getStart(), Matchers.notNullValue()));
+                List<TaskTreeDTO> list2 = Lambda.select(list, Lambda.having(Lambda.on(TaskTreeDTO.class).getStart(), Matchers.nullValue()));
                 list.clear();
                 list.addAll(list1);
                 list.addAll(list2);
             } else if (sort_.equals("sort-sdate-down")) {
                 Collections.sort(list, Comparators.DATE_TASKS_DOWN);
-                List<TaskTreeDTO> list1 = Lambda.select(list,Lambda.having(Lambda.on(TaskTreeDTO.class).getStart(),Matchers.notNullValue()));
-                List<TaskTreeDTO> list2 = Lambda.select(list,Lambda.having(Lambda.on(TaskTreeDTO.class).getStart(),Matchers.nullValue()));
+                List<TaskTreeDTO> list1 = Lambda.select(list, Lambda.having(Lambda.on(TaskTreeDTO.class).getStart(), Matchers.notNullValue()));
+                List<TaskTreeDTO> list2 = Lambda.select(list, Lambda.having(Lambda.on(TaskTreeDTO.class).getStart(), Matchers.nullValue()));
                 list.clear();
                 list.addAll(list1);
-                list.addAll(list2);                
+                list.addAll(list2);
             } else if (sort_.equals("sort-prio-up")) {
                 Collections.sort(list, Comparators.PRIORITY_TASKS_UP);
             } else if (sort_.equals("sort-prio-down")) {
@@ -51,14 +51,11 @@ public class SortUtil {
 
     public static void sortGroups(GroupSortEntity gs, List<GroupSortDTO> list) {
         String group_ = gs.getGroup_();
-        if (group_.startsWith("group-sdate")) {
-            if (group_.equals("group-sdate-up")) {
-                Collections.sort(list, Comparators.DATE_GROUP_UP);
-            } else if (group_.equals("group-sdate-down")) {
-                Collections.sort(list, Comparators.DATE_GROUP_DOWN);
-            }
-        }
-        else {
+        if (group_.equals("group-sdate-up")) {
+            Collections.sort(list, Comparators.DATE_GROUP_UP);
+        } else if (group_.equals("group-sdate-down")) {
+            Collections.sort(list, Comparators.DATE_GROUP_DOWN);
+        } else {
             Collections.sort(list, Comparators.GROUP_DOWN);
         }
     }
@@ -186,8 +183,7 @@ class Comparators {
             return result;
         }
     };
-    
-    
+
     public static Comparator<GroupSortDTO> GROUP_DOWN = new Comparator<GroupSortDTO>() {
         @Override
         public int compare(GroupSortDTO o1, GroupSortDTO o2) {
