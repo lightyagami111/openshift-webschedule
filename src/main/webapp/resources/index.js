@@ -1,3 +1,5 @@
+/* global moment, textboxio */
+
 var textboxioNotes;
 var selectedCalEvent;
 

@@ -1,5 +1,7 @@
 
 
+/* global DEFAULT_COLOR */
+
 var optionColors = {
     color: DEFAULT_COLOR,
     showPaletteOnly: true,

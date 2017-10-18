@@ -1,3 +1,5 @@
+/* global moment */
+
 function initDateTimePickers() {
     
     $('.datepicker-sch').val('');

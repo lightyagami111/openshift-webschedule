@@ -1,3 +1,5 @@
+/* global moment */
+
 var task_list_template = $('#tasks_list_template').html();
 
 function refreshTasksListsCallback(result) {
@@ -113,7 +115,7 @@ function showMoreInfo(data_tasks, element) {
 
             if (task.priority !== 1) {
                 var append = '';
-                if (haveAppendedText == true) {
+                if (haveAppendedText === true) {
                     append = '&nbsp;&nbsp;|| ';
                 }
                 m.append(append + 'prio ' + task.priority);
@@ -130,7 +132,7 @@ function showMoreInfo(data_tasks, element) {
 
                 if (labels_text.length > 0) {
                     var append = '';
-                    if (haveAppendedText == true) {
+                    if (haveAppendedText === true) {
                         append = '&nbsp;&nbsp;|| ';
                     }
                     m.append(append + 'labels ' + labels_text);

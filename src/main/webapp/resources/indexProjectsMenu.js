@@ -1,3 +1,5 @@
+/* global DEFAULT_COLOR */
+
 function loadProjectsMenu(data_projects) {
 
     $('#side-menu').jstree({
