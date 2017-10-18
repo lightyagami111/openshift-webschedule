@@ -255,40 +255,6 @@ function deleteRAllTaskData(id, callback) {
 }
 
 
-function loadTaskRepeatData(task_id, callback) {
-    var sTaskId = "";
-    if (task_id !== null) {
-        sTaskId = "id=" + task_id;
-    }
-
-    jQuery.ajax({
-        type: "GET",
-        url: '/WebSchedule/loadTaskRepeatData',
-        data: sTaskId,
-        success: function (result) {
-            callback(result);
-        },
-        error: function (xhr) {
-            errorMessage(xhr);
-        }
-    });
-}
-
-function saveTaskRepeatData(repeatData, callback) {
-    jQuery.ajax({
-        type: "POST",
-        url: '/WebSchedule/saveTaskRepeatData' + _csrf,
-        data: JSON.stringify(repeatData),
-        contentType: 'application/json; charset=UTF-8',
-        success: function (result) {
-            callback(result);
-        },
-        error: function (xhr) {
-            errorMessage(xhr);
-        }
-    });
-}
-
 
 function loadTaskRepeatDataCurrentEvent(task_id, start, end, callback) {
     var params = "id=" + task_id + "&start=" + start;

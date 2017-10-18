@@ -46,7 +46,7 @@ $(document).ready(function () {
         $('#edit_link_title').val(item.text());
         $('#edit_link_url').val(item.attr('href'));
         
-        $('#edit_link_button').unbind( "click");
+        $('#edit_link_button').unbind('click');
         $('#edit_link_button').click(function () {
             item.text($('#edit_link_title').val());
             item.attr('href', $('#edit_link_url').val());

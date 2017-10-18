@@ -7,10 +7,9 @@ import com.webschedule.design.datastructure.GroupSortFromLabelDTO;
 import com.webschedule.design.datastructure.GroupSortFromProjectDTO;
 import com.webschedule.design.datastructure.LabelEntity;
 import com.webschedule.design.datastructure.ProjectEntity;
-import com.webschedule.design.datastructure.SaveRequestTaskDTO;
-import com.webschedule.design.datastructure.TaskAndSubTasksDTO;
 import com.webschedule.design.datastructure.TaskEntity;
-import com.webschedule.design.datastructure.TaskRepeatDataDTO;
+import com.webschedule.design.datastructure.TaskRequestLoadDTO;
+import com.webschedule.design.datastructure.TaskRequestSaveDTO;
 import com.webschedule.design.services.DaoService;
 import com.webschedule.design.services.GroupAndSortService;
 import com.webschedule.design.services.TasksService;
@@ -145,13 +144,7 @@ public class BaseController {
 
         return result;
     }
-
-    @RequestMapping(value = {"/loadTaskData"}, method = RequestMethod.GET)
-    public @ResponseBody
-    TaskAndSubTasksDTO loadTaskData(@RequestParam(value = "id") Long id) {
-        return tasksService.loadTaskData(id);
-    }
-
+    
     @RequestMapping(value = {"/getParentTaskProject"}, method = RequestMethod.GET)
     public @ResponseBody
     Map getParentTaskProject(@RequestParam(value = "parent_id") Long parent_id) {
@@ -159,6 +152,12 @@ public class BaseController {
 
         return Utils.mapOf("parent_project_id", result.getProject_id());
     }
+
+    @RequestMapping(value = {"/loadTaskData"}, method = RequestMethod.GET)
+    public @ResponseBody
+    TaskRequestLoadDTO loadTaskData(@RequestParam(value = "id") Long id) {
+        return tasksService.loadTaskData(id);
+    }    
 
     @RequestMapping(value = {"/loadInitialTaskData"}, method = RequestMethod.GET)
     public @ResponseBody
@@ -174,17 +173,19 @@ public class BaseController {
         if (findProjectById == null) {
             return new ResponseEntity("Default project not found (project_id=" + project_id + ")", HttpStatus.NOT_FOUND);
         }
-        TaskEntity t = tasksService.loadInitialTaskData(findProjectById, parent_id, insert, labels, start, end);
+        TaskRequestLoadDTO t = tasksService.loadInitialTaskData(findProjectById, parent_id, insert, labels, start, end);
 
         return ResponseEntity.ok(t);
     }
 
     @RequestMapping(value = {"/saveTaskData"}, method = RequestMethod.POST)
     public @ResponseBody
-    ResponseEntity saveTaskData(@RequestBody SaveRequestTaskDTO dTO) throws ParseException {
-        if (dTO.getAllDay() == false) {
-            if (StringUtils.isBlank(dTO.getStart())) {
-                return new ResponseEntity(">> allDay is false ; start date/time is null", HttpStatus.BAD_REQUEST);
+    ResponseEntity saveTaskData(@RequestBody TaskRequestSaveDTO dTO) throws ParseException {
+        if (dTO.getAllDay() != null) {
+            if (dTO.getAllDay() == false) {
+                if (StringUtils.isBlank(dTO.getStart())) {
+                    return new ResponseEntity(">> allDay is false ; start date/time is null", HttpStatus.BAD_REQUEST);
+                }
             }
         }
 
@@ -192,38 +193,23 @@ public class BaseController {
         if (project == null) {
             return new ResponseEntity("Project not found (project_id=" + dTO.getProject_id() + ")", HttpStatus.NOT_FOUND);
         }
+        
+        if (dTO.getRepeatData() != null) {
+            if (StringUtils.isBlank(dTO.getRepeatData().getMode())) {
+                return new ResponseEntity("'mode' is null", HttpStatus.BAD_REQUEST);
+            }
+            if (dTO.getRepeatData().getMode_start() == null) {
+                return new ResponseEntity("'starting on' is null", HttpStatus.BAD_REQUEST);
+            }            
+        }
 
         tasksService.saveTaskData(dTO, project);
 
         return ResponseEntity.ok(dTO);
     }
 
-    @RequestMapping(value = {"/loadTaskRepeatData"}, method = RequestMethod.GET)
-    public @ResponseBody
-    TaskRepeatDataDTO loadTaskRepeatData(@RequestParam(value = "id", required = false) Long task_id) {
-        return tasksService.loadTaskRepeatData(task_id);
-    }
-
-    @RequestMapping(value = {"/saveTaskRepeatData"}, method = RequestMethod.POST)
-    public @ResponseBody
-    ResponseEntity saveTaskRepeatData(@RequestBody TaskRepeatDataDTO dTO) {
-
-        TaskEntity task = daoService.findTaskById(dTO.getTask_id());
-
-        if (task == null) {
-            return new ResponseEntity("task not found", HttpStatus.BAD_REQUEST);
-        }
-        if (StringUtils.isBlank(dTO.getMode())) {
-            return new ResponseEntity("'mode' is null", HttpStatus.BAD_REQUEST);
-        }
-        if (dTO.getMode_start() == null) {
-            return new ResponseEntity("'starting on' is null", HttpStatus.BAD_REQUEST);
-        }
-
-        tasksService.saveTaskRepeatData(dTO, task);
-
-        return ResponseEntity.ok(dTO);
-    }
+    
+    
 
     @RequestMapping(value = {"/loadTaskRepeatDataCurrentEvent"}, method = RequestMethod.GET)
     public @ResponseBody
@@ -232,7 +218,7 @@ public class BaseController {
             @RequestParam(value = "start") @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date start,
             @RequestParam(value = "end", required = false) @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss") Date end
     ) {
-        TaskAndSubTasksDTO t = tasksService.loadTaskRepeatDataCurrentEvent(task_id, start, end);
+        TaskRequestLoadDTO t = tasksService.loadTaskRepeatDataCurrentEvent(task_id, start, end);
 
         return Utils.mapOf(
                 "taskData", t,

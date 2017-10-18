@@ -13,7 +13,7 @@ import java.util.Set;
  *
  * @author asd
  */
-public class TaskAndSubTasksDTO {
+public class TaskRequestLoadDTO {
     
     private Long id;
     private ProjectEntity project;
@@ -28,6 +28,7 @@ public class TaskAndSubTasksDTO {
     private Set<LabelEntity> labels = new HashSet<>();
     private Set<LinkEntity> links = new HashSet<>();    
     private Set<TaskEntity> subTasks = new HashSet<>();
+    private TaskRepeatDataDTO repeatData;
 
     public Long getId() {
         return id;
@@ -143,6 +144,14 @@ public class TaskAndSubTasksDTO {
 
     public void setSubTasks(Set<TaskEntity> subTasks) {
         this.subTasks = subTasks;
+    }
+
+    public TaskRepeatDataDTO getRepeatData() {
+        return repeatData;
+    }
+
+    public void setRepeatData(TaskRepeatDataDTO repeatData) {
+        this.repeatData = repeatData;
     }
     
     

@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @author ivaylo
  */
-public class SaveRequestTaskDTO implements Serializable {
+public class TaskRequestSaveDTO implements Serializable {
     
     private Long id;
     private String text;
@@ -29,6 +29,7 @@ public class SaveRequestTaskDTO implements Serializable {
     private Boolean allDay;
     private Long fromRepeatTaskId;
     private String fromRepeatTaskStart;
+    private TaskRepeatDataDTO repeatData;
 
     public Long getId() {
         return id;
@@ -150,5 +151,13 @@ public class SaveRequestTaskDTO implements Serializable {
         this.links = links;
     }
 
+    public TaskRepeatDataDTO getRepeatData() {
+        return repeatData;
+    }
+
+    public void setRepeatData(TaskRepeatDataDTO repeatData) {
+        this.repeatData = repeatData;
+    }
+    
     
 }

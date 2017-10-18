@@ -121,9 +121,7 @@ $(document).ready(function () {
         loadTaskRepeatDataCurrentEvent(id, start, end, function (result) {
             var form = $('#formBodyModal');
             enableTaskEditing(form);
-            loadTaskRepeatData(result.taskData.id, function (repeatData) {
-                loadSchDataAjaxCallback(form, result.taskData, repeatData, result.task_id, result.repeatTaskStart);
-            });
+            loadSchDataAjaxCallback(form, result.taskData, result.task_id, result.repeatTaskStart);
         });
 
     });
@@ -154,13 +152,9 @@ $(document).ready(function () {
             $('#editTask_Modal').modal('hide');
             refreshData();
         });
-    });
+    });    
 
-    $('#formBodyDesktop').find('input[name="repeatTrue"]').attr('id', 'repeatTrue_d');
-    $('#formBodyDesktop').find('label[for="repeatTrue"]').attr('for', 'repeatTrue_d');
-    $('#formBodyModal').find('input[name="repeatTrue"]').attr('id', 'repeatTrue_m');
-    $('#formBodyModal').find('label[for="repeatTrue"]').attr('for', 'repeatTrue_m');
-    
+
 
 
     //-------------------------------------
@@ -182,16 +176,7 @@ $(document).ready(function () {
     $('#endson_until').on('click', function () {
         $('#endson_count_input').prop('disabled', true);
         setDatePickerPropDisabled('endson_until_input', false);
-    });
-    $('.repeatTask_Modal_Button').on('click', function () {
-        var form = $(this).parents('.fbody');
-        var tid = form.find('.task_Modal_Task_id').val();
-        loadRepeatSchData(tid);
-    });
-    $('#repeatTask_Modal_done').on('click', function (event) {
-        event.preventDefault();
-        saveRepeatSchData();
-    });
+    });        
 
 
     //-------------------------------------
@@ -344,16 +329,12 @@ function disableTaskEditing(form) {
 function loadSchData(form, task_id, start, end) {
     if (task_id !== null) {
         loadTaskData(task_id, function (taskData) {
-            loadTaskRepeatData(taskData.id, function (repeatData) {
-                loadSchDataAjaxCallback(form, taskData, repeatData, null, null);
-            });
+            loadSchDataAjaxCallback(form, taskData, null, null);
         });
     } else {
         getDefaultProject(function (result) {
             loadInitialTaskData(result.project_id, '#', start, end, false, null, function (taskData) {
-                loadTaskRepeatData(null, function (repeatData) {
-                    loadSchDataAjaxCallback(form, taskData, repeatData, null, null);
-                });
+                loadSchDataAjaxCallback(form, taskData, null, null);
             });
         });
     }
@@ -361,26 +342,13 @@ function loadSchData(form, task_id, start, end) {
 }
 
 
-function loadSchDataAjaxCallback(form, taskData, repeatData, fromRepeatTaskId, fromRepeatTaskStart) {
+function loadSchDataAjaxCallback(form, taskData, fromRepeatTaskId, fromRepeatTaskStart) {
 
 
-    if (repeatData.dbExist === true) {
-        form.find('.repeatTask_Modal_Button').removeClass('btn-default');
-        form.find('.repeatTask_Modal_Button').addClass('btn-primary');
+    if (taskData.repeatData.dbExist === true) {
         form.find('.delRTaskAll_Modal_Button').show();
-        form.find('.date_time_Modal_Button').hide();
     } else {
-        form.find('.repeatTask_Modal_Button').removeClass('btn-primary');
-        form.find('.repeatTask_Modal_Button').addClass('btn-default');
         form.find('.delRTaskAll_Modal_Button').hide();
-        form.find('.date_time_Modal_Button').show();
-    }
-
-
-    if ($('input[name="selectedView"]').val() === 'calendar' && repeatData.dbExist === true) {
-        form.find('.makeEditableCurrentTaskInfo').show();
-    } else {
-        form.find('.makeEditableCurrentTaskInfo').hide();
     }
 
     if ($('input[name="selectedView"]').val() === 'calendar') {
@@ -396,7 +364,12 @@ function loadSchDataAjaxCallback(form, taskData, repeatData, fromRepeatTaskId, f
         $(".del_modal").find(".modal-body p").text(taskData.text);
         $('.delTask_id').val(taskData.id);
     }
-
+    
+    if ($('input[name="selectedView"]').val() === 'calendar' && taskData.repeatData.dbExist === true) {
+        form.find('.makeEditableCurrentTaskInfo').show();
+    } else {
+        form.find('.makeEditableCurrentTaskInfo').hide();
+    }
 
 
     form.find('.task_Modal_Task_id').val(taskData.id);
@@ -405,7 +378,35 @@ function loadSchDataAjaxCallback(form, taskData, repeatData, fromRepeatTaskId, f
     form.find('input[name="taskName"]').val(taskData.text);
 
 
+    //// date & time
+    var funcDateTimeButtons = function (b) {
+        if (b===true) {
+            form.find('.repeatTask_Modal_Button').removeClass('btn-default');
+            form.find('.repeatTask_Modal_Button').addClass('btn-primary');
+            form.find('.date_time_Modal_Button').hide();
+        }
+        else {
+            form.find('.repeatTask_Modal_Button').removeClass('btn-primary');
+            form.find('.repeatTask_Modal_Button').addClass('btn-default');
+            form.find('.date_time_Modal_Button').show();
+        }
+    };    
+    funcDateTimeButtons(taskData.repeatData.dbExist);    
+    
+    $('.repeatTask_Modal_Button').unbind('click');
+    $('.repeatTask_Modal_Button').on('click', function () {
+        loadRepeatSchDataAjaxCallback(taskData.repeatData);
+    });    
+    
+    $('#repeatTask_Modal_done').unbind('click');
+    $('#repeatTask_Modal_done').on('click', function (event) {
+        event.preventDefault();     
+        var do_repeat = $('#repeatTrue').prop('checked');
+        funcDateTimeButtons(do_repeat);
+        taskData.repeatData = getRepeatSchData();        
+    });
 
+    
     if (taskData.start !== null || taskData.end !== null) {
         form.find('.date_time_Modal_Button').removeClass('btn-default');
         form.find('.date_time_Modal_Button').addClass('btn-primary');
@@ -520,13 +521,21 @@ function saveSchData(form) {
     }
     taskData.text = title;
 
-    taskData.allDay = $('input[name="allDay"]').prop('checked');
-    if (taskData.allDay === true) {
-        setTimeToPicker('start', null);
-        setTimeToPicker('end', null);
+    
+    var do_repeat = $('#repeatTrue').prop('checked');
+    if (do_repeat === true) {
+        taskData.repeatData = getRepeatSchData();
     }
-    taskData.start = getDateTimeData('start');
-    taskData.end = getDateTimeData('end');
+    else {
+        taskData.allDay = $('input[name="allDay"]').prop('checked');
+        if (taskData.allDay === true) {
+            setTimeToPicker('start', null);
+            setTimeToPicker('end', null);
+        }
+        taskData.start = getDateTimeData('start');
+        taskData.end = getDateTimeData('end');
+    }
+    
 
     taskData.project_id = getEditTaskProject();
     taskData.parent = getTaskParent();
@@ -543,7 +552,7 @@ function saveSchData(form) {
     var content = textboxioNotes.content.get();
     taskData.notes = content;
 
-    taskData.links = getLinksList();
+    taskData.links = getLinksList();        
 
     saveTaskData(taskData, function () {
         refreshData();
@@ -551,11 +560,9 @@ function saveSchData(form) {
 }
 
 
-function loadRepeatSchData(task_id) {
-    loadTaskRepeatData(task_id, loadRepeatSchDataAjaxCallback);
-}
 
 function loadRepeatSchDataAjaxCallback(repeatData) {
+    $('#repeatTrue').prop('checked', repeatData.dbExist);
     $('.taskRepeat_Modal_Task_id').val(repeatData.task_id);
     $('.r').hide();
     $('.' + repeatData.mode).show();
@@ -563,7 +570,17 @@ function loadRepeatSchDataAjaxCallback(repeatData) {
     $('input[name="endson"][value="' + repeatData.endson + '"]').click();
     $('#endson_count_input').val(repeatData.endson_count);
 
-    setDateToPicker('rstart', repeatData.mode_start);
+    var mode_start;
+    if (repeatData.dbExist===true) {
+        mode_start = repeatData.mode_start;
+    }
+    else {
+        mode_start = Date.now();
+        if ($('input[name="selectedView"]').val() === 'calendar') {
+            mode_start = moment(getDateFromPicker('start'),'YYYY-MM-DD').valueOf();
+        }
+    }
+    setDateToPicker('rstart', mode_start);
     $('input[name="allDayRepeat"]').prop('checked', repeatData.allDay);
     if (repeatData.allDay === false) {
         setTimeToPicker('startRepeat', repeatData.mode_start);
@@ -596,12 +613,14 @@ function loadRepeatSchDataAjaxCallback(repeatData) {
 }
 
 
-function saveRepeatSchData() {
+function getRepeatSchData() {
     var repeatData = new Object();
+    
+    repeatData.dbExist = $('#repeatTrue').prop('checked');
+    
     var tid = $('.taskRepeat_Modal_Task_id').val();
     if (tid.length === 0) {
-        alert('Please save task data before saving the repaeat data!');
-        return;
+        tid = null;
     }
     repeatData.task_id = tid;
 
@@ -653,8 +672,5 @@ function saveRepeatSchData() {
 
     repeatData.repeat_years = $('#repeat_years').val();
 
-    saveTaskRepeatData(repeatData, function () {
-        $('.repeatTask_Modal_Button').removeClass('btn-default');
-        $('.repeatTask_Modal_Button').addClass('btn-primary');
-    });
+    return repeatData;
 }

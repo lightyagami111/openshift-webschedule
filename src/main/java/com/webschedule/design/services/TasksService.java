@@ -10,11 +10,11 @@ import com.webschedule.design.datastructure.GroupSortDTO;
 import com.webschedule.design.datastructure.GroupSortEntity;
 import com.webschedule.design.datastructure.LabelEntity;
 import com.webschedule.design.datastructure.ProjectEntity;
-import com.webschedule.design.datastructure.SaveRequestTaskDTO;
-import com.webschedule.design.datastructure.TaskAndSubTasksDTO;
 import com.webschedule.design.datastructure.TaskEntity;
 import com.webschedule.design.datastructure.TaskRepeatDataDTO;
 import com.webschedule.design.datastructure.TaskRepeatDataEntity;
+import com.webschedule.design.datastructure.TaskRequestLoadDTO;
+import com.webschedule.design.datastructure.TaskRequestSaveDTO;
 import com.webschedule.design.datastructure.TaskTreeDTO;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -169,9 +169,10 @@ public class TasksService {
         return taskDTO;
     }
 
-    public TaskAndSubTasksDTO loadTaskData(Long task_id) {
-        TaskEntity task = daoService.findTaskById(task_id);
-        TaskAndSubTasksDTO result = new TaskAndSubTasksDTO();
+    public TaskRequestLoadDTO loadTaskData(Long task_id) {
+        TaskRequestLoadDTO result = new TaskRequestLoadDTO();
+        
+        TaskEntity task = daoService.findTaskById(task_id);        
         Copier.copy(task, result);
 
         String parent_id = String.valueOf(task.getId());
@@ -182,11 +183,15 @@ public class TasksService {
             }
         }
         result.setSubTasks(new HashSet(findAllSubtasks));
-
+        
+        result.setRepeatData(loadTaskRepeatData(task_id));
+        
         return result;
     }
 
-    public TaskEntity loadInitialTaskData(ProjectEntity findProjectById, String parent_id, Boolean insert, Long[] labels, Date start, Date end) {
+    public TaskRequestLoadDTO loadInitialTaskData(ProjectEntity findProjectById, String parent_id, Boolean insert, Long[] labels, Date start, Date end) {
+        TaskRequestLoadDTO result = new TaskRequestLoadDTO();
+        
         TaskEntity t = new TaskEntity();
         t.setProject(findProjectById);
 
@@ -211,20 +216,17 @@ public class TasksService {
         if (insert) {
             t.setId(daoService.save(t));
         }
-        return t;
+        Copier.copy(t, result);
+        
+        result.setRepeatData(loadTaskRepeatData(null));
+        
+        return result;
     }
 
-    public void saveTaskData(SaveRequestTaskDTO dTO, ProjectEntity project) throws ParseException {
+    public void saveTaskData(TaskRequestSaveDTO dTO, ProjectEntity project) throws ParseException {
         TaskEntity t;
-        Date start = Utils.parse(dTO.getStart());
-        Date end = Utils.parse(dTO.getEnd());
         if (dTO.getId() != null) {
             t = daoService.findTaskById(dTO.getId());
-            TaskRepeatDataEntity rep = daoService.findRepeatDataByTaskId(dTO.getId());
-            if (rep != null) {
-                start = null;
-                end = null;
-            }
         } else {
             t = new TaskEntity();
         }
@@ -234,8 +236,16 @@ public class TasksService {
         }                
 
         t.setText(dTO.getText());
-        t.setStart(start);
-        t.setEnd(end);
+        
+        if (dTO.getRepeatData() != null) {            
+            t.setStart(null);
+            t.setEnd(null);
+        }
+        else {
+            t.setStart(Utils.parse(dTO.getStart()));
+            t.setEnd(Utils.parse(dTO.getEnd()));
+        }
+        
         t.setParent(dTO.getParent());
         t.setParent_text(dTO.getParent_text());
         t.setProject(project);
@@ -256,6 +266,9 @@ public class TasksService {
         }
 
         daoService.saveOrUpdate(t);
+        if (dTO.getRepeatData() != null) {
+            saveTaskRepeatData(dTO.getRepeatData(), t);
+        }
 
         List<TaskEntity> subTasks = daoService.findAllSubtasks(String.valueOf(t.getId()));
         for (TaskEntity subTask : subTasks) {
@@ -294,13 +307,12 @@ public class TasksService {
             obj.setRepeat_weeks(1);
             obj.setRepeat_months(1);
             obj.setAllDay(Boolean.TRUE);
-            obj.setMode_start(Utils.format(new Date()));
         }
         obj.setDbExist(t != null);
 
         return obj;
     }
-
+    
     public void saveTaskRepeatData(TaskRepeatDataDTO dTO, TaskEntity task) {
         TaskRepeatDataEntity t = daoService.findRepeatDataByTaskId(dTO.getTask_id());
 
@@ -329,7 +341,7 @@ public class TasksService {
         daoService.saveOrUpdate(t);
     }
 
-    public TaskAndSubTasksDTO loadTaskRepeatDataCurrentEvent(Long task_id, Date start, Date end) {
+    public TaskRequestLoadDTO loadTaskRepeatDataCurrentEvent(Long task_id, Date start, Date end) {
         TaskEntity t = daoService.findTaskById(task_id);
         t.setId(null);
         t.setStart(start);
@@ -338,7 +350,7 @@ public class TasksService {
         t.setParent_text(t.getText());
         t.setAllDay(daoService.findRepeatDataByTaskId(task_id).getAllDay());
         
-        TaskAndSubTasksDTO result = new TaskAndSubTasksDTO();
+        TaskRequestLoadDTO result = new TaskRequestLoadDTO();
         Copier.copy(t, result);
 
         return result;
