@@ -64,7 +64,6 @@
             </div>
 
             <div class="modal-body">
-                <input type="hidden" class="form-control" id="edit_link_id">
                 <input type="text" class="form-control" id="edit_link_title">
                 <br>
                 <input type="text" class="form-control" id="edit_link_url">

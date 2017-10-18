@@ -453,11 +453,11 @@ function loadSchDataAjaxCallback(form, taskData, repeatData, fromRepeatTaskId, f
 
     $('#link_input').val('');
     if (taskData.links !== null && taskData.links.length > 0) {
-        loadLinksList(taskData.links, taskData.id);
+        loadLinksList(taskData.links);
         form.find('.editLinks_Modal_Button').removeClass('btn-default');
         form.find('.editLinks_Modal_Button').addClass('btn-primary');
     } else {
-        loadLinksList([], taskData.id);
+        loadLinksList([]);
         form.find('.editLinks_Modal_Button').removeClass('btn-primary');
         form.find('.editLinks_Modal_Button').addClass('btn-default');
     }
@@ -543,6 +543,7 @@ function saveSchData(form) {
     var content = textboxioNotes.content.get();
     taskData.notes = content;
 
+    taskData.links = getLinksList();
 
     saveTaskData(taskData, function () {
         refreshData();

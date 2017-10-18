@@ -250,6 +250,10 @@ public class TasksService {
                 t.getLabels().add(label);
             }
         }
+        t.getLinks().clear();
+        if (dTO.getLinks() != null && !dTO.getLinks().isEmpty()) {
+            t.setLinks(new HashSet<>(dTO.getLinks()));
+        }
 
         daoService.saveOrUpdate(t);
 

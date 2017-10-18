@@ -9,7 +9,7 @@
     
 
     <div id="link_item_template">
-        <li class="list-group-item" data-id="">
+        <li class="list-group-item">
             <table style="width : 100%">
                 <tr>
                     <td>

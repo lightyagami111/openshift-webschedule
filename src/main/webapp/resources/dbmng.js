@@ -11,10 +11,10 @@ function errorMessage(xhr) {
     $('#error_Modal_Button').click();
 }
 
-function saveLink(body, callback) {
+function getTitleFromUrlLink(body, callback) {
     jQuery.ajax({
         type: "POST",
-        url: '/WebSchedule/link' + _csrf,
+        url: '/WebSchedule/link/title' + _csrf,
         data: JSON.stringify(body),
         contentType: 'application/json; charset=UTF-8',
         success: function (result) {
@@ -25,36 +25,6 @@ function saveLink(body, callback) {
         }
     });
 }
-
-function deleteLink(link, task, callback) {
-    jQuery.ajax({
-        type: "DELETE",
-        url: '/WebSchedule/link' + _csrf + "&link=" + link + "&task=" + task,
-        success: function () {
-            callback();
-        },
-        error: function (xhr) {
-            errorMessage(xhr);
-        }
-    });
-}
-
-
-function updateLink(link, callback) {
-    jQuery.ajax({
-        type: "PUT",
-        url: '/WebSchedule/link' + _csrf,
-        data: JSON.stringify(link),
-        contentType: 'application/json; charset=UTF-8',
-        success: function (result) {
-            callback(result);
-        },
-        error: function (xhr) {
-            errorMessage(xhr);
-        }
-    });
-}
-
 
 
 

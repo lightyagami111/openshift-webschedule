@@ -6,6 +6,7 @@
 package com.webschedule.design.datastructure;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  *
@@ -23,6 +24,7 @@ public class SaveRequestTaskDTO implements Serializable {
     private String start;
     private String end;
     private Long[] labels;
+    private List<LinkEntity> links;
     private Integer priority;
     private Boolean allDay;
     private Long fromRepeatTaskId;
@@ -139,6 +141,14 @@ public class SaveRequestTaskDTO implements Serializable {
     public void setFromRepeatTaskStart(String fromRepeatTaskStart) {
         this.fromRepeatTaskStart = fromRepeatTaskStart;
     }
-    
+
+    public List<LinkEntity> getLinks() {
+        return links;
+    }
+
+    public void setLinks(List<LinkEntity> links) {
+        this.links = links;
+    }
+
     
 }

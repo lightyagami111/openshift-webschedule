@@ -6,7 +6,6 @@ import com.webschedule.design.datastructure.GroupSortEntity;
 import com.webschedule.design.datastructure.GroupSortFromLabelDTO;
 import com.webschedule.design.datastructure.GroupSortFromProjectDTO;
 import com.webschedule.design.datastructure.LabelEntity;
-import com.webschedule.design.datastructure.LinkEntity;
 import com.webschedule.design.datastructure.ProjectEntity;
 import com.webschedule.design.datastructure.SaveRequestTaskDTO;
 import com.webschedule.design.datastructure.TaskAndSubTasksDTO;
@@ -322,52 +321,21 @@ public class BaseController {
         return tasksService.loadEvents(start, end);
     }
 
+    
     //--------------------------------------------------------------------------
     // LINKS
     //--------------------------------------------------------------------------
-    @RequestMapping(value = "/link", method = RequestMethod.POST)
-    public @ResponseBody
-    LinkEntity getTitleFromUrlLink(@RequestBody Map<String, Object> body) throws IOException {
-        Long taskId = Long.valueOf(body.get("taskId").toString());
+    @RequestMapping(value = "/link/title", method = RequestMethod.POST)
+    public @ResponseBody Map getTitleFromUrlLink(@RequestBody Map<String, Object> body) throws IOException {
         String url = body.get("url").toString();
 
         Document doc = Jsoup.connect(url).get();
         String title = doc.title();
-
-        LinkEntity le = new LinkEntity();
-        le.setTitle(title);
-        le.setUrl(url);
-
-        le.setId(daoService.save(le));
-
-        TaskEntity te = daoService.findTaskById(taskId);
-        te.getLinks().add(le);
-        daoService.saveOrUpdate(te);
-
-        return le;
+        
+        return Utils.mapOf("title", title);
     }
 
-    @RequestMapping(value = "/link", method = RequestMethod.DELETE)
-    public @ResponseBody
-    ResponseEntity deleteLink(@RequestParam(value = "link") Long link, @RequestParam(value = "task") Long task) {
-        daoService.deleteLink(link, task);
-        return ResponseEntity.ok(link);
-    }
-
-    @RequestMapping(value = "/link", method = RequestMethod.PUT)
-    public @ResponseBody
-    ResponseEntity updateLink(@RequestBody Map<String, Object> body) {
-        Long id = Long.valueOf(body.get("id").toString());
-        String url = body.get("url").toString();
-        String title = body.get("title").toString();
-
-        LinkEntity le = daoService.findLinkById(id);
-        le.setTitle(title);
-        le.setUrl(url);
-        daoService.updateLink(le);
-        return ResponseEntity.ok(le);
-    }
-
+    
     //--------------------------------------------------------------------------
     // GROUP && SORT 
     //--------------------------------------------------------------------------
