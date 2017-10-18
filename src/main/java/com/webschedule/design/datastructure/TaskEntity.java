@@ -49,7 +49,7 @@ public class TaskEntity implements Serializable {
     private Boolean allDay;
     
     
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     private Set<LabelEntity> labels = new HashSet<>();
     
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)

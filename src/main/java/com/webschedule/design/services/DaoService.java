@@ -249,35 +249,14 @@ public class DaoService {
     //--------------------------------------------------------------------------
     // LINKS
     //--------------------------------------------------------------------------
-    public Long save(LinkEntity p) {
-        return (Long) getCurrentSession().save(p);
-    }
 
-    public void updateLink(LinkEntity p) {
-        getCurrentSession().merge(p);
-    }
-
-    public LinkEntity findLinkById(Long id) {
-        LinkEntity p = null;
-        List list = getCurrentSession().createQuery("SELECT p FROM LinkEntity p WHERE p.id = :_id").setParameter("_id", id).list();
-        if (list != null && !list.isEmpty()) {
-            p = (LinkEntity) list.get(0);
-        }
-        return p;
-    }
-
-    public void deleteLink(Long link, Long task) {
-        TaskEntity findTaskById = findTaskById(task);
-        for (Iterator iterator1 = findTaskById.getLinks().iterator(); iterator1.hasNext();) {
+    public void deleteLinks(TaskEntity task) {
+        for (Iterator iterator1 = task.getLinks().iterator(); iterator1.hasNext();) {
             LinkEntity next = (LinkEntity) iterator1.next();
-            if (next.getId().compareTo(link) == 0) {
-                iterator1.remove();
-                saveOrUpdate(findTaskById);
-                getCurrentSession().delete(next);
-                break;
-            }
+            iterator1.remove();
+            saveOrUpdate(task);
+            getCurrentSession().delete(next);
         }
-
     }
 
     //--------------------------------------------------------------------------

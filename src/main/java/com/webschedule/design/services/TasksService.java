@@ -250,7 +250,7 @@ public class TasksService {
                 t.getLabels().add(label);
             }
         }
-        t.getLinks().clear();
+        daoService.deleteLinks(t);
         if (dTO.getLinks() != null && !dTO.getLinks().isEmpty()) {
             t.setLinks(new HashSet<>(dTO.getLinks()));
         }
