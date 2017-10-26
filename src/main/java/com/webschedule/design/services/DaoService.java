@@ -240,10 +240,9 @@ public class DaoService {
     }
 
     public void deleteEventExceptions(TaskRepeatDataEntity rep) {
-        List<EventException> findEventExceptions = findEventExceptions(rep);
-        for (EventException findEventException : findEventExceptions) {
-            getCurrentSession().delete(findEventException);
-        }
+        getCurrentSession().createQuery("DELETE FROM EventException e WHERE e.taskRepeatDataEntity.id = :_rep_id")
+                .setParameter("_rep_id", rep.getId())
+                .executeUpdate();
     }
 
     //--------------------------------------------------------------------------

@@ -24,6 +24,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,13 +45,13 @@ public class TasksService {
 
     @Autowired
     private RepeatableService repeatableService;
-    
+
     @Autowired
     private GroupAndSortService groupAndSortService;
 
     public List<GroupSortDTO> groupAndSort(GroupSortEntity gs, List<TaskEntity> tasks) {
         List<GroupSortDTO> result = new ArrayList<>();
-        
+
         List<TaskTreeDTO> tasksdto = new ArrayList<>();
         for (TaskEntity task : tasks) {
             tasksdto.add(taskEntityToTree(task, gs));
@@ -106,13 +112,13 @@ public class TasksService {
             String noDate = "";
             for (TaskTreeDTO task : tasksdto) {
                 String key;
-                if (task.getStartComputed()!= null) {
+                if (task.getStartComputed() != null) {
                     Calendar c = Calendar.getInstance();
                     c.setTime(task.getStartComputed());
                     c.set(Calendar.HOUR_OF_DAY, 0);
                     key = Utils.format(c.getTime(), "yyyy-MM-dd");
                 } else {
-                    key = noDate;                   
+                    key = noDate;
                 }
                 List<TaskTreeDTO> value = map.get(key);
                 if (value == null) {
@@ -159,7 +165,7 @@ public class TasksService {
             taskDTO.setParent("#");
             taskDTO.setParent_text("");
         }
-        
+
         TaskRepeatDataEntity taskRepEntity = daoService.findRepeatDataByTaskId(loadTask.getId());
         if (taskRepEntity != null) {
             taskDTO.setRep(taskRepEntity);
@@ -171,8 +177,8 @@ public class TasksService {
 
     public TaskRequestLoadDTO loadTaskData(Long task_id) {
         TaskRequestLoadDTO result = new TaskRequestLoadDTO();
-        
-        TaskEntity task = daoService.findTaskById(task_id);        
+
+        TaskEntity task = daoService.findTaskById(task_id);
         Copier.copy(task, result);
 
         String parent_id = String.valueOf(task.getId());
@@ -183,15 +189,15 @@ public class TasksService {
             }
         }
         result.setSubTasks(new HashSet(findAllSubtasks));
-        
+
         result.setRepeatData(loadTaskRepeatData(task_id));
-        
+
         return result;
     }
 
     public TaskRequestLoadDTO loadInitialTaskData(ProjectEntity findProjectById, String parent_id, Boolean insert, Long[] labels, Date start, Date end) {
         TaskRequestLoadDTO result = new TaskRequestLoadDTO();
-        
+
         TaskEntity t = new TaskEntity();
         t.setProject(findProjectById);
 
@@ -217,9 +223,9 @@ public class TasksService {
             t.setId(daoService.save(t));
         }
         Copier.copy(t, result);
-        
+
         result.setRepeatData(loadTaskRepeatData(null));
-        
+
         return result;
     }
 
@@ -233,19 +239,18 @@ public class TasksService {
 
         if (dTO.getFromRepeatTaskId() != null) {
             daoService.deleteCurrentEvent(dTO.getFromRepeatTaskId(), Utils.parse(dTO.getFromRepeatTaskStart()));
-        }                
+        }
 
         t.setText(dTO.getText());
-        
-        if (dTO.getRepeatData() != null) {            
+
+        if (dTO.getRepeatData() != null) {
             t.setStart(null);
             t.setEnd(null);
-        }
-        else {
+        } else {
             t.setStart(Utils.parse(dTO.getStart()));
             t.setEnd(Utils.parse(dTO.getEnd()));
         }
-        
+
         t.setParent(dTO.getParent());
         t.setParent_text(dTO.getParent_text());
         t.setProject(project);
@@ -312,7 +317,7 @@ public class TasksService {
 
         return obj;
     }
-    
+
     public void saveTaskRepeatData(TaskRepeatDataDTO dTO, TaskEntity task) {
         TaskRepeatDataEntity t = daoService.findRepeatDataByTaskId(dTO.getTask_id());
 
@@ -349,7 +354,7 @@ public class TasksService {
         t.setParent(String.valueOf(task_id));
         t.setParent_text(t.getText());
         t.setAllDay(daoService.findRepeatDataByTaskId(task_id).getAllDay());
-        
+
         TaskRequestLoadDTO result = new TaskRequestLoadDTO();
         Copier.copy(t, result);
 
@@ -404,10 +409,27 @@ public class TasksService {
 
             res.add(d);
         }
-
+        
         List<TaskRepeatDataEntity> findRepeatableTasks = daoService.findRepeatableTasks();
-        for (TaskRepeatDataEntity findRepeatableTask : findRepeatableTasks) {
-            res.addAll(repeatableService.computeFireTimesBetween(findRepeatableTask, start, end));
+        ExecutorService executorService = Executors.newFixedThreadPool(4);        
+        if (!findRepeatableTasks.isEmpty()) {
+            int numberOfRequests = findRepeatableTasks.size();
+            List<RepeatableWorkThread> tasks = new ArrayList<>(numberOfRequests);
+            for (int i = 0; i < numberOfRequests; i++) {
+                TaskRepeatDataEntity findRepeatableTask = findRepeatableTasks.get(i);             
+                tasks.add(new RepeatableWorkThread(findRepeatableTask, start, end, repeatableService));
+            }
+            try {
+                List<Future<List<CalendarUIEventDTO>>> futures = executorService.invokeAll(tasks);
+                for (Future<List<CalendarUIEventDTO>> future : futures) {
+                    List<CalendarUIEventDTO> result = future.get();                    
+                    res.addAll(result);
+                }
+
+                executorService.shutdown();
+            } catch (InterruptedException | ExecutionException ex) {
+                Logger.getLogger(TasksService.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
 
         return res;

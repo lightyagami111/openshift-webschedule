@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -31,7 +30,7 @@ import org.springframework.stereotype.Service;
 public class RepeatableService {
 
     private static final Map<String, Integer> weekDays;
-
+    
     static {
         Map<String, Integer> aMap = new HashMap();
         aMap.put("MO", 1);
@@ -44,16 +43,11 @@ public class RepeatableService {
         weekDays = Collections.unmodifiableMap(aMap);
     }
 
-    @Autowired
-    private DaoService daoService;
-
     public List<CalendarUIEventDTO> computeFireTimesBetween(TaskRepeatDataEntity rep, Date start, Date end) {
         List<CalendarUIEventDTO> list1 = new ArrayList<>();
 
         TaskEntity f = rep.getTask();
-
-        List<EventException> findEventExceptions = daoService.findEventExceptions(rep);
-        List<Date> eventExceptions = Lambda.extract(findEventExceptions, Lambda.on(EventException.class).getDateException());
+        List<Date> eventExceptions = Lambda.extract(rep.getEventsEx(), Lambda.on(EventException.class).getDateException());
 
 
         Date now = calculateNextInitial(rep.getMode_start(), rep);
@@ -63,8 +57,11 @@ public class RepeatableService {
             if (afterOrEqual(now,start) && beforeOrEqual(now,end) && !eventExceptions.contains(now)) {
                 list1.add(createCalendarUIEventDTO(now, rep, f));
             }
+            else if (! beforeOrEqual(now,end)) {
+                break;
+            }
             count++;
-            now = calculateNext(now, rep);
+            now = calculateNext(now, rep);            
         }
 
         return list1;
@@ -72,23 +69,18 @@ public class RepeatableService {
 
     public CalendarUIEventDTO computeNextFire(TaskRepeatDataEntity rep) {
         TaskEntity f = rep.getTask();
-        List<EventException> findEventExceptions = daoService.findEventExceptions(rep);
-        List<Date> eventExceptions = Lambda.extract(findEventExceptions, Lambda.on(EventException.class).getDateException());
+        List<Date> eventExceptions = Lambda.extract(rep.getEventsEx(), Lambda.on(EventException.class).getDateException());
 
         Date now = calculateNextInitial(rep.getMode_start(), rep);
         int count = 0;
-        List<CalendarUIEventDTO> list = new ArrayList<>();
+        CalendarUIEventDTO ev = null;
         while (haveNext(now, count, rep)) {
             if (!eventExceptions.contains(now)) {
-                list.add(createCalendarUIEventDTO(now, rep, f));
+                ev = createCalendarUIEventDTO(now, rep, f);
+                break;
             }            
             count++;
             now = calculateNext(now, rep);
-        }
-        
-        CalendarUIEventDTO ev = null;
-        if (!list.isEmpty()) {
-            ev = list.get(0);
         }
         
         return ev;

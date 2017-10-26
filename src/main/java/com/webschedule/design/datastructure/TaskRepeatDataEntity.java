@@ -11,8 +11,10 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import org.apache.commons.lang.StringUtils;
@@ -42,14 +44,18 @@ public class TaskRepeatDataEntity implements Serializable {
     
     private String endson;
     @Temporal(javax.persistence.TemporalType.TIMESTAMP)
-    private Date endson_until;
-    
+    private Date endson_until;    
     private Integer endson_count;
+    
+    
     private Integer repeat_days;
     private Integer repeat_weeks;
     private String repeat_wdays;
     private Integer repeat_months;
     private String repeatby;
+    
+    @OneToMany(fetch = FetchType.EAGER)
+    private List<EventException> eventsEx;
 
     public Long getId() {
         return id;
@@ -178,6 +184,15 @@ public class TaskRepeatDataEntity implements Serializable {
     public void setAllDay(Boolean allDay) {
         this.allDay = allDay;
     }
+
+    public List<EventException> getEventsEx() {
+        return eventsEx;
+    }
+
+    public void setEventsEx(List<EventException> eventsEx) {
+        this.eventsEx = eventsEx;
+    }
+    
     
     
 }
