@@ -243,20 +243,45 @@ public class TasksService {
 
         t.setText(dTO.getText());
 
+        t.setAllDay(dTO.getAllDay());
         if (dTO.getRepeatData() != null) {
             t.setStart(null);
             t.setEnd(null);
         } else {
             t.setStart(Utils.parse(dTO.getStart()));
             t.setEnd(Utils.parse(dTO.getEnd()));
+            
+            if (t.getAllDay()) {
+                if (t.getEnd() != null) {
+                    Calendar c = Calendar.getInstance();
+                    c.setTime(t.getEnd());
+                    c.add(Calendar.DATE, 1);
+                    t.setEnd(c.getTime());
+                }
+            } else {
+                if (t.getEnd() != null) {
+                    Calendar c = Calendar.getInstance();
+                    c.setTime(t.getEnd());
+                    int h = c.get(Calendar.HOUR);
+                    int m = c.get(Calendar.MINUTE);
+
+                    c.setTime(t.getStart());
+                    c.set(Calendar.HOUR, h);
+                    c.set(Calendar.MINUTE, m);
+
+                    if (c.get(Calendar.HOUR) != 0 || c.get(Calendar.MINUTE) != 0) {
+                        t.setEnd(c.getTime());
+                    }
+                    t.setEnd(c.getTime());
+                }
+            }
         }
 
         t.setParent(dTO.getParent());
         t.setParent_text(dTO.getParent_text());
         t.setProject(project);
         t.setNotes(dTO.getNotes());
-        t.setPriority(dTO.getPriority());
-        t.setAllDay(dTO.getAllDay());
+        t.setPriority(dTO.getPriority());        
 
         t.getLabels().clear();
         if (dTO.getLabels() != null) {
@@ -379,34 +404,9 @@ public class TasksService {
             d.setTitle(f.getText());
             d.setAllDay(f.getAllDay());
             d.setStart(Utils.format(f.getStart()));
+            d.setEnd(Utils.format(f.getEnd()));
             d.setColor(f.getProject_color());
-
-            if (f.getAllDay()) {
-                if (f.getEnd() != null) {
-                    Calendar c = Calendar.getInstance();
-                    c.setTime(f.getEnd());
-                    c.add(Calendar.DATE, 1);
-                    d.setEnd(Utils.format(c.getTime()));
-                }
-            } else {
-                if (f.getEnd() != null) {
-                    Calendar c = Calendar.getInstance();
-                    c.setTime(f.getEnd());
-                    int h = c.get(Calendar.HOUR);
-                    int m = c.get(Calendar.MINUTE);
-
-                    c.setTime(f.getStart());
-                    c.set(Calendar.HOUR, h);
-                    c.set(Calendar.MINUTE, m);
-
-                    if (c.get(Calendar.HOUR) != 0 || c.get(Calendar.MINUTE) != 0) {
-                        d.setEnd(Utils.format(c.getTime()));
-                    }
-                    f.setEnd(c.getTime());
-                    daoService.saveOrUpdate(f);
-                }
-            }
-
+            
             res.add(d);
         }
         

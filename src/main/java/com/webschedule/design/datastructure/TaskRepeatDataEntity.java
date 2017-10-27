@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -17,13 +18,17 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  *
  * @author ivaylo
  */
 @Entity
+@Cacheable
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class TaskRepeatDataEntity implements Serializable {
     
     @Id
@@ -31,6 +36,7 @@ public class TaskRepeatDataEntity implements Serializable {
     private Long id;
     
     @OneToOne
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private TaskEntity task;
     
     private String mode;
@@ -55,6 +61,7 @@ public class TaskRepeatDataEntity implements Serializable {
     private String repeatby;
     
     @OneToMany(fetch = FetchType.EAGER)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private List<EventException> eventsEx;
 
     public Long getId() {

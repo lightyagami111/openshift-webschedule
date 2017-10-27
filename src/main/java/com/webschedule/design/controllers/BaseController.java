@@ -19,7 +19,9 @@ import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.lang.StringUtils;
+import net.sf.ehcache.Cache;
+import net.sf.ehcache.CacheManager;
+import org.apache.commons.lang3.StringUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +47,120 @@ public class BaseController {
 
     @Autowired
     private GroupAndSortService groupAndSortService;
+
+    @RequestMapping(value = {"/cacheManager"}, method = RequestMethod.GET)
+    public @ResponseBody
+    String cacheManager() {
+        StringBuilder sb = new StringBuilder();
+        StringBuilder sb1 = new StringBuilder();
+        CacheManager cacheManager = CacheManager.getInstance();
+        long totalEvictedCount = 0l;
+        long totalExpiredCount = 0l;
+        long totalHitCount = 0l;
+        long totalMissCount = 0l;
+        long totalMissExpiredCount = 0l;
+        long totalMissNotFoundCount = 0l;
+        long totalPutAddedCount = 0l;
+        long totalPutCount = 0l;
+        long totalPutUpdatedCount = 0l;
+        long totalRemoveCount = 0l;
+        long totalLocalHeapSize = 0l;
+        long totalLocalHeapSizeInBytes = 0l;
+        long totalLocalOffHeapSize = 0l;
+        long totalLocalOffHeapSizeInBytes = 0l;
+        long totalRemoteSize = 0l;
+        long totalSize = 0l;
+        long totalHeapHitCount = 0l;
+        long totalHeapMissCount = 0l;
+        long totalHeapPutAddedCount = 0l;
+        long totalHeapPutCount = 0l;
+        long totalHeapPutUpdatedCount = 0l;
+        long totalHeapRemoveCount = 0l;
+        
+        
+        
+        /* get stats for all known caches */
+        for (String name : cacheManager.getCacheNames()) {
+            Cache cache = cacheManager.getCache(name);
+            totalEvictedCount = totalEvictedCount + cache.getStatistics().cacheEvictedCount();
+            totalExpiredCount = totalExpiredCount + cache.getStatistics().cacheExpiredCount();
+            totalHitCount = totalHitCount + cache.getStatistics().cacheHitCount();
+            totalMissCount = totalMissCount + cache.getStatistics().cacheMissCount();
+            totalMissExpiredCount = totalMissExpiredCount + cache.getStatistics().cacheMissExpiredCount();
+            totalMissNotFoundCount = totalMissNotFoundCount + cache.getStatistics().cacheMissNotFoundCount();
+            totalPutAddedCount = totalPutAddedCount + cache.getStatistics().cachePutAddedCount();
+            totalPutCount = totalPutCount + cache.getStatistics().cachePutCount();
+            totalPutUpdatedCount = totalPutUpdatedCount + cache.getStatistics().cachePutUpdatedCount();
+            totalRemoveCount = totalRemoveCount + cache.getStatistics().cacheRemoveCount();
+            totalLocalHeapSize = totalLocalHeapSize + cache.getStatistics().getLocalHeapSize();
+            totalLocalHeapSizeInBytes = totalLocalHeapSizeInBytes + cache.getStatistics().getLocalHeapSizeInBytes();
+            totalLocalOffHeapSize = totalLocalOffHeapSize + cache.getStatistics().getLocalOffHeapSize();
+            totalLocalOffHeapSizeInBytes = totalLocalOffHeapSizeInBytes + cache.getStatistics().getLocalOffHeapSizeInBytes();
+            totalRemoteSize = totalRemoteSize + cache.getStatistics().getRemoteSize();
+            totalSize = totalSize + cache.getStatistics().getSize();
+            totalHeapHitCount = totalHeapHitCount + cache.getStatistics().localHeapHitCount();
+            totalHeapMissCount = totalHeapMissCount + cache.getStatistics().localHeapMissCount();
+            totalHeapPutAddedCount = totalHeapPutAddedCount + cache.getStatistics().localHeapPutAddedCount();
+            totalHeapPutCount = totalHeapPutCount + cache.getStatistics().localHeapPutCount();
+            totalHeapPutUpdatedCount = totalHeapPutUpdatedCount + cache.getStatistics().localHeapPutUpdatedCount();
+            totalHeapRemoveCount = totalHeapRemoveCount + cache.getStatistics().localHeapRemoveCount();
+            
+            sb.append(name)
+                    .append("\n cacheEvictedCount = " + cache.getStatistics().cacheEvictedCount())
+                    .append("\n cacheExpiredCount = " + cache.getStatistics().cacheExpiredCount())
+                    .append("\n cacheHitCount = " + cache.getStatistics().cacheHitCount())
+                    .append("\n cacheMissCount = " + cache.getStatistics().cacheMissCount())
+                    .append("\n cacheMissExpiredCount = " + cache.getStatistics().cacheMissExpiredCount())
+                    .append("\n cacheMissNotFoundCount = " + cache.getStatistics().cacheMissNotFoundCount())
+                    .append("\n cachePutAddedCount = " + cache.getStatistics().cachePutAddedCount())
+                    .append("\n cachePutCount = " + cache.getStatistics().cachePutCount())
+                    .append("\n cachePutUpdatedCount = " + cache.getStatistics().cachePutUpdatedCount())
+                    .append("\n cacheRemoveCount = " + cache.getStatistics().cacheRemoveCount())
+                    .append("\n getLocalHeapSize = " + cache.getStatistics().getLocalHeapSize())
+                    .append("\n getLocalHeapSizeInBytes = " + cache.getStatistics().getLocalHeapSizeInBytes())
+                    .append("\n getLocalOffHeapSize = " + cache.getStatistics().getLocalOffHeapSize())
+                    .append("\n getLocalOffHeapSizeInBytes = " + cache.getStatistics().getLocalOffHeapSizeInBytes())
+                    .append("\n getRemoteSize = " + cache.getStatistics().getRemoteSize())
+                    .append("\n getSize = " + cache.getStatistics().getSize())
+                    .append("\n localHeapHitCount = " + cache.getStatistics().localHeapHitCount())
+                    .append("\n localHeapMissCount = " + cache.getStatistics().localHeapMissCount())
+                    .append("\n localHeapPutAddedCount = " + cache.getStatistics().localHeapPutAddedCount())
+                    .append("\n localHeapPutCount = " + cache.getStatistics().localHeapPutCount())
+                    .append("\n localHeapPutUpdatedCount = " + cache.getStatistics().localHeapPutUpdatedCount())
+                    .append("\n localHeapRemoveCount = " + cache.getStatistics().localHeapRemoveCount())
+                    .append("\n\n");
+        }
+        
+        
+        sb1.append("TOTAL : ")
+                .append("\n cacheEvictedCount = " + totalEvictedCount)
+                    .append("\n cacheExpiredCount = " + totalExpiredCount)
+                    .append("\n cacheHitCount = " + totalHitCount)
+                    .append("\n cacheMissCount = " + totalMissCount)
+                    .append("\n cacheMissExpiredCount = " + totalMissExpiredCount)
+                    .append("\n cacheMissNotFoundCount = " + totalMissNotFoundCount)
+                    .append("\n cachePutAddedCount = " + totalPutAddedCount)
+                    .append("\n cachePutCount = " + totalPutCount)
+                    .append("\n cachePutUpdatedCount = " + totalPutUpdatedCount)
+                    .append("\n cacheRemoveCount = " + totalRemoveCount)
+                    .append("\n getLocalHeapSize = " + totalLocalHeapSize)
+                    .append("\n getLocalHeapSizeInBytes = " + totalLocalHeapSizeInBytes)
+                    .append("\n getLocalOffHeapSize = " + totalLocalOffHeapSize)
+                    .append("\n getLocalOffHeapSizeInBytes = " + totalLocalOffHeapSizeInBytes)
+                    .append("\n getRemoteSize = " + totalRemoteSize)
+                    .append("\n getSize = " + totalSize)
+                    .append("\n localHeapHitCount = " + totalHeapHitCount)
+                    .append("\n localHeapMissCount = " + totalHeapMissCount)
+                    .append("\n localHeapPutAddedCount = " + totalHeapPutAddedCount)
+                    .append("\n localHeapPutCount = " + totalHeapPutCount)
+                    .append("\n localHeapPutUpdatedCount = " + totalHeapPutUpdatedCount)
+                    .append("\n localHeapRemoveCount = " + totalHeapRemoveCount)
+                    .append("\n\n");
+        
+        
+        return sb1.append(sb).toString();
+
+    }
 
     //--------------------------------------------------------------------------
     // PROJECTS
@@ -144,7 +260,7 @@ public class BaseController {
 
         return result;
     }
-    
+
     @RequestMapping(value = {"/getParentTaskProject"}, method = RequestMethod.GET)
     public @ResponseBody
     Map getParentTaskProject(@RequestParam(value = "parent_id") Long parent_id) {
@@ -157,7 +273,7 @@ public class BaseController {
     public @ResponseBody
     TaskRequestLoadDTO loadTaskData(@RequestParam(value = "id") Long id) {
         return tasksService.loadTaskData(id);
-    }    
+    }
 
     @RequestMapping(value = {"/loadInitialTaskData"}, method = RequestMethod.GET)
     public @ResponseBody
@@ -193,23 +309,20 @@ public class BaseController {
         if (project == null) {
             return new ResponseEntity("Project not found (project_id=" + dTO.getProject_id() + ")", HttpStatus.NOT_FOUND);
         }
-        
+
         if (dTO.getRepeatData() != null) {
             if (StringUtils.isBlank(dTO.getRepeatData().getMode())) {
                 return new ResponseEntity("'mode' is null", HttpStatus.BAD_REQUEST);
             }
             if (dTO.getRepeatData().getMode_start() == null) {
                 return new ResponseEntity("'starting on' is null", HttpStatus.BAD_REQUEST);
-            }            
+            }
         }
 
         tasksService.saveTaskData(dTO, project);
 
         return ResponseEntity.ok(dTO);
     }
-
-    
-    
 
     @RequestMapping(value = {"/loadTaskRepeatDataCurrentEvent"}, method = RequestMethod.GET)
     public @ResponseBody
@@ -307,21 +420,20 @@ public class BaseController {
         return tasksService.loadEvents(start, end);
     }
 
-    
     //--------------------------------------------------------------------------
     // LINKS
     //--------------------------------------------------------------------------
     @RequestMapping(value = "/link/title", method = RequestMethod.POST)
-    public @ResponseBody Map getTitleFromUrlLink(@RequestBody Map<String, Object> body) throws IOException {
+    public @ResponseBody
+    Map getTitleFromUrlLink(@RequestBody Map<String, Object> body) throws IOException {
         String url = body.get("url").toString();
 
         Document doc = Jsoup.connect(url).get();
         String title = doc.title();
-        
+
         return Utils.mapOf("title", title);
     }
 
-    
     //--------------------------------------------------------------------------
     // GROUP && SORT 
     //--------------------------------------------------------------------------
