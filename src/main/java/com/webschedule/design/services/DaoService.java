@@ -262,32 +262,13 @@ public class DaoService {
     // EVENTS
     //--------------------------------------------------------------------------
     public List<TaskEntity> findTasksBetween(Date start, Date end) {
-        List<Long> trs = getCurrentSession().createQuery("SELECT p.task.id FROM TaskRepeatDataEntity p").list();
-        trs.add(Long.MIN_VALUE); //just to make sure list is not empty
-
-        List<TaskEntity> list1 = getCurrentSession()
-                .createQuery("SELECT p FROM TaskEntity p WHERE (:_start <= p.start OR p.start <= :_end) AND p.id NOT IN (:_trs)")
+        return getCurrentSession()
+                .createQuery("SELECT p FROM TaskEntity p"
+                        + " WHERE (p.start BETWEEN :_start and :_end) OR (p.end BETWEEN :_start and :_end)"
+                        + " OR (:_start BETWEEN p.start and p.end) OR (:_end BETWEEN p.start and p.end)")
                 .setParameter("_start", start)
                 .setParameter("_end", end)
-                .setParameterList("_trs", trs)
                 .list();
-
-        List<Long> excludeTasksList1 = Lambda.extract(list1, Lambda.on(TaskEntity.class).getId());
-        excludeTasksList1.add(Long.MIN_VALUE); //just to make sure list is not empty
-
-        List<TaskEntity> list2 = getCurrentSession()
-                .createQuery("SELECT p FROM TaskEntity p WHERE (:_start <= p.end OR p.end <= :_end) AND p.id NOT IN (:_trs) AND p.id NOT IN (:_list1)")
-                .setParameter("_start", start)
-                .setParameter("_end", end)
-                .setParameterList("_trs", trs)
-                .setParameterList("_list1", excludeTasksList1)
-                .list();
-
-        list1.addAll(list2);
-
-        Map<Long, TaskEntity> m = Lambda.index(list1, Lambda.on(TaskEntity.class).getId());
-
-        return new ArrayList<>(m.values());
     }
     
     

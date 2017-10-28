@@ -241,7 +241,6 @@ function showCalendarWrapper() {
     $('input[name="selectedValue"]').val(startD + ' - ' + endD);
     $('#calendar').fullCalendar('option', 'contentHeight', "auto");
 
-    refreshData();
 }
 
 function hideCalendarWrapper() {
