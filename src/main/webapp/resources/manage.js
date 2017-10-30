@@ -31,48 +31,76 @@ $(document).ready(function () {
 
     loadProjects(loadProjectsAjaxCallback2);
     loadLabels(loadLabelsAjaxCallback2);
+    loadCalendars(loadCalendarsAjaxCallback2);
 
 
 
-
-    $("#addNewSchProject_pcolor").spectrum(optionColors);
-    $("#updateSchProject_pcolor").spectrum(optionColors);
+    $("#addNewSchCalendar_pcolor").spectrum(optionColors);
+    $("#updateSchCalendar_pcolor").spectrum(optionColors);
 
 
 
     $('#addNewProject_Modal_c').on('click', function () {
-        addNewSchProject();
-        location.reload();
+        addNewSchProject();        
     });
 
     $('#addNewSchLabel_Modal_c').on('click', function () {
-        addNewSchLabel();
-        location.reload();
+        addNewSchLabel();        
+    });    
+    
+    $('#addNewCalendar_Modal_c').on('click', function () {
+        addNewSchCalendar();        
     });
+    
 
-    $('#deleteSchLabel_Modal_c').on('click', function () {
-        deleteSchLabel();
-        location.reload();
-    });
 
     $('#updateProject_Modal_c').on('click', function () {
-        updateSchProject();
-        location.reload();
+        updateSchProject();        
     });
 
     $('#updateSchLabel_Modal_c').on('click', function () {
-        updateSchLabel();
-        location.reload();
+        updateSchLabel();        
     });
+    
+    $('#updateCalendar_Modal_c').on('click', function () {
+        updateSchCalendar();        
+    });
+    
+    
+    
 
     $('#deleteProject_Modal_c').on('click', function () {
         deleteSchProject();        
     });
+    
+    $('#deleteSchLabel_Modal_c').on('click', function () {
+        deleteSchLabel();        
+    });
+
+    $('#deleteCalendar_Modal_c').on('click', function () {
+        deleteSchCalendar();
+    });
 
 
+
+
+
+    onHideNewSchLabelModel();
+    onHideUpdateSchLabelModal();
+    onHideDeleteSchLabelModal();
+    
+    onHideNewProjectModal();
+    onHideUpdateSchProjectModal();
+    onHideDeleteSchProjectModal();
+    
+    onHideNewCalendarModal();
+    onHideUpdateSchCalendarModal();
+    onHideDeleteSchCalendarModal();
+    
+    
 
     $('#addNewSchLabel_Modal').on('hidden.bs.modal', function () {
-        $('#addNewSchLabel_pname').val('');
+        onHideNewSchLabelModel();
     });
     $('#updateSchLabel_Modal').on('hidden.bs.modal', function () {
         onHideUpdateSchLabelModal();
@@ -82,9 +110,7 @@ $(document).ready(function () {
     });
 
     $('#addNewProject_Modal').on('hidden.bs.modal', function () {
-        $('#addNewSchProject_pname').val('');
-        $("#addNewSchProject_pcolor").spectrum("set", "rgb(255, 255, 255)");
-        $('#addNewSchProject_pname_parent').val('#');
+        onHideNewProjectModal();
     });
     $('#updateProject_Modal').on('hidden.bs.modal', function () {
         onHideUpdateSchProjectModal();
@@ -92,7 +118,16 @@ $(document).ready(function () {
     $('#deleteProject_Modal').on('hidden.bs.modal', function () {
         onHideDeleteSchProjectModal();
     });
-
+    
+    $('#addNewCalendar_Modal').on('hidden.bs.modal', function () {
+        onHideNewCalendarModal();
+    });
+    $('#updateCalendar_Modal').on('hidden.bs.modal', function () {
+        onHideUpdateSchCalendarModal();
+    });
+    $('#deleteCalendar_Modal').on('hidden.bs.modal', function () {
+        onHideDeleteSchCalendarModal();
+    });
 
 });
 
@@ -137,22 +172,68 @@ function getLabelByIdAjaxCallback(label) {
 }
 
 
-function getProjectByidAjaxCallback(p) {
-    $('#updateProject_Modal form fieldset').removeAttr('disabled');
-    $("#updateSchProject_pcolor").spectrum("enable");
-    $('#updateProject_Modal_id').val(p.id);
-    $('#updateSchProject_pname_new').val(p.text);
-    $('#updateSchProject_pname_parent').val(p.parent);
+function addNewSchLabel() {
     
-    var pcolor = null;
-    if (p.bckgColor !== null) {
-        pcolor = p.bckgColor;
-    }
-    else {
-        pcolor = DEFAULT_COLOR;
-    }
-    $("#updateSchProject_pcolor").spectrum('set', pcolor);    
+    var label = {
+        text: $('#addNewSchLabel_pname').val()
+    };
+    addNewLabel(label, function () {
+        $('#addNewSchLabel_Modal').modal('hide');
+        location.reload();
+    });
+    
 }
+
+function updateSchLabel() {
+
+    var label_id = $('#updateLabel_Modal_id').val();
+    var label_name_txt = $('#updateSchLabel_pname').val();
+
+    var label = {
+        id: label_id,
+        text: label_name_txt
+    };
+    updateLabel(label, function () {
+        $('#updateSchLabel_Modal').modal('hide');
+        location.reload();
+    });    
+}
+
+function deleteSchLabel() {
+    var project_name_txt = $('#deleteSchLabel_pname').val();
+    if (project_name_txt !== 'DELETE') {
+        alert('type DELETE');
+    } else {
+        deleteLabel($('#deleteLabel_Modal_id').val(), function() {
+            $('#deleteSchLabel_Modal').modal('hide');
+            location.reload();
+        });        
+    }
+}
+
+function onHideNewSchLabelModel() {
+    $('#addNewSchLabel_pname').val('');
+}
+
+function onHideUpdateSchLabelModal() {
+    $('#updateSchLabel').val('null');
+    $('#updateSchLabel_pname').val('');
+    $('#updateSchLabel_Modal form fieldset').attr('disabled', 'disabled');
+}
+
+function onHideDeleteSchLabelModal() {
+    $('#deleteSchLabel').val('null');
+    $('#deleteSchLabel_pname').val('');
+    $('#deleteSchLabel_Modal form fieldset').attr('disabled', 'disabled');
+}
+
+
+
+
+
+
+
+
 
 
 function loadProjectsAjaxCallback2(data_projects) {
@@ -196,102 +277,50 @@ function loadProjectsAjaxCallback2(data_projects) {
     getDefaultProject(function (result) {
         if (result.project_id !== null) {
             $('#defaultSchProject_p').val(result.project_id);
+        }        
+        else {
+            $('#defaultSchProject_p').val('');
         }
-        
     });
 }
 
 
-
-
-
-
-
-
-function addNewSchLabel() {
-    
-    var label = {
-        text: $('#addNewSchLabel_pname').val()
-    };
-    addNewLabel(label, function () {
-        $('#addNewSchLabel_Modal').modal('hide');
-    });
-    
+function getProjectByidAjaxCallback(p) {
+    $('#updateProject_Modal form fieldset').removeAttr('disabled');
+    $('#updateProject_Modal_id').val(p.id);
+    $('#updateSchProject_pname_new').val(p.text);
+    $('#updateSchProject_pname_parent').val(p.parent);
 }
-
-function updateSchLabel() {
-
-    var label_id = $('#updateLabel_Modal_id').val();
-    var label_name_txt = $('#updateSchLabel_pname').val();
-
-    var label = {
-        id: label_id,
-        text: label_name_txt
-    };
-    updateLabel(label, function () {
-        $('#updateSchLabel_Modal').modal('hide');
-    });    
-}
-
-function onHideUpdateSchLabelModal() {
-    $('#updateSchLabel').val('null');
-    $('#updateSchLabel_pname').val('');
-    $('#updateSchLabel_Modal form fieldset').attr('disabled', 'disabled');
-}
-
-function deleteSchLabel() {
-    var project_name_txt = $('#deleteSchLabel_pname').val();
-    if (project_name_txt !== 'DELETE') {
-        alert('type DELETE');
-    } else {
-        deleteLabel($('#deleteLabel_Modal_id').val(), function() {
-            $('#deleteSchLabel_Modal').modal('hide');
-        });        
-    }
-}
-
-function onHideDeleteSchLabelModal() {
-    $('#deleteSchLabel').val('null');
-    $('#deleteSchLabel_pname').val('');
-    $('#deleteSchLabel_Modal form fieldset').attr('disabled', 'disabled');
-}
-
-
-
-
-
 
 
 function addNewSchProject() {
 
     var project_name_txt = $('#addNewSchProject_pname').val();
-    var project_bckgColor = $("#addNewSchProject_pcolor").spectrum('get').toHexString();
     var parent_project_id = $("#addNewSchProject_pname_parent option:selected").val();
 
     var p = {
         text: project_name_txt,
-        bckgColor: project_bckgColor,
         parent: parent_project_id
     };
     addNewProject(p, function () {        
         $('#addNewProject_Modal').modal('hide');
+        location.reload();
     });
 }
 
 function updateSchProject() {
     var project_id = $('#updateProject_Modal_id').val();
     var project_name_txt = $('#updateSchProject_pname_new').val();
-    var project_bckgColor = $("#updateSchProject_pcolor").spectrum('get').toHexString();
     var project_parent_id = $("#updateSchProject_pname_parent option:selected").val();
 
     var p = {
         id: project_id,
         text: project_name_txt,
-        bckgColor: project_bckgColor,
         parent: project_parent_id
     };
     updateProject(p, function () {
         $('#updateProject_Modal').modal('hide');
+        location.reload();
     });    
 }
 
@@ -307,17 +336,158 @@ function deleteSchProject() {
     }
 }
 
+function onHideNewProjectModal() {
+    $('#addNewSchProject_pname').val('');
+    $('#addNewSchProject_pname_parent').val('#');
+}
+
 function onHideUpdateSchProjectModal() {
     $('#updateSchProject_p').val('null');
     $('#updateSchProject_pname_new').val('');
-    $("#updateSchProject_pcolor").spectrum("set", "rgb(255, 255, 255)");
     $('#updateSchProject_pname_parent').val('#');
     $('#updateProject_Modal form fieldset').attr('disabled', 'disabled');
-    $("#updateSchLabel_pcolor").spectrum("disable");
 }
 
 function onHideDeleteSchProjectModal() {
     $('#deleteSchProject_p').val('null');
     $('#deleteSchProject_pname_new').val('');
     $('#deleteProject_Modal form fieldset').attr('disabled', 'disabled');
+}
+
+
+
+
+
+
+
+
+
+
+function loadCalendarsAjaxCallback2(data_calendars) {
+    var option = '';
+    for (var i = 0; i < data_calendars.length; i++) {
+        option += '<option value="' + data_calendars[i].id + '">' + data_calendars[i].title + '</option>';
+    }
+
+    $('#updateSchCalendar_p').append(option);
+    $('#updateSchCalendar_p').on('change', function () {
+        var sVal = $(this).val();
+        if (sVal === 'null') {
+            onHideUpdateSchCalendarModal();
+            return;
+        }
+        getCalendarByid(sVal, getCalendarByidAjaxCallback);
+    });
+
+    $('#deleteSchCalendar_p').append(option);
+    $('#deleteSchCalendar_p').on('change', function () {
+        var sVal = $(this).val();
+        if (sVal === 'null') {
+            onHideDeleteSchCalendarModal();
+            return;
+        }
+        $('#deleteCalendar_Modal form fieldset').removeAttr('disabled');
+        $('#deleteCalendar_Modal_id').val(sVal);
+    });
+    
+    
+    $('#defaultSchCalendar_p').append(option);
+    $('#defaultSchCalendar_p').on('change', function () {
+        var sVal = $(this).val();
+        if (sVal === 'null') {
+            return;
+        }
+        setDefaultCalendar(sVal, function () {});
+    });
+    getDefaultCalendar(function (result) {
+        if (result.calendar_id !== null) {
+            $('#defaultSchCalendar_p').val(result.calendar_id);
+        } 
+        else {
+            $('#defaultSchCalendar_p').val('');
+        }
+    });
+    
+}
+
+
+
+function getCalendarByidAjaxCallback(p) {
+    $('#updateCalendar_Modal form fieldset').removeAttr('disabled');
+    $("#updateSchCalendar_pcolor").spectrum("enable");
+    $('#updateCalendar_Modal_id').val(p.id);
+    $('#updateSchCalendar_pname_new').val(p.title);
+    
+    var pcolor = null;
+    if (p.bckgColor !== null) {
+        pcolor = p.bckgColor;
+}
+    else {
+        pcolor = DEFAULT_COLOR;
+    }
+    $("#updateSchCalendar_pcolor").spectrum('set', pcolor);    
+}
+
+
+
+function addNewSchCalendar() {
+
+    var calendar_name_txt = $('#addNewSchCalendar_pname').val();
+    var calendar_bckgColor = $("#addNewSchCalendar_pcolor").spectrum('get').toHexString();
+
+    var p = {
+        title: calendar_name_txt,
+        bckgColor: calendar_bckgColor
+    };
+    addNewCalendar(p, function () {        
+        $('#addNewCalendar_Modal').modal('hide');
+        location.reload();
+    });
+}
+
+function updateSchCalendar() {
+    var calendar_id = $('#updateCalendar_Modal_id').val();
+    var calendar_name_txt = $('#updateSchCalendar_pname_new').val();
+    var calendar_bckgColor = $("#updateSchCalendar_pcolor").spectrum('get').toHexString();
+
+    var p = {
+        id: calendar_id,
+        title: calendar_name_txt,
+        bckgColor: calendar_bckgColor
+    };
+    updateCalendar(p, function () {
+        $('#updateCalendar_Modal').modal('hide');
+        location.reload();
+    });    
+}
+
+function deleteSchCalendar() {
+    var calendar_name_txt = $('#deleteSchCalendar_pname_new').val();
+    if (calendar_name_txt !== 'DELETE') {
+        alert('type DELETE');
+    } else {
+        deleteCalendar($('#deleteCalendar_Modal_id').val(), function () {
+            $('#deleteCalendar_Modal').modal('hide');
+            location.reload();
+        });        
+    }
+}
+
+function onHideUpdateSchCalendarModal() {
+    $('#updateSchCalendar_p').val('null');
+    $('#updateSchCalendar_pname_new').val('');
+    $("#updateSchCalendar_pcolor").spectrum({color: DEFAULT_COLOR});
+    $('#updateCalendar_Modal form fieldset').attr('disabled', 'disabled');
+    $("#updateSchLabel_pcolor").spectrum("disable");
+}
+
+function onHideDeleteSchCalendarModal() {
+    $('#deleteSchCalendar_p').val('null');
+    $('#deleteSchCalendar_pname_new').val('');
+    $('#deleteCalendar_Modal form fieldset').attr('disabled', 'disabled');
+}
+
+function onHideNewCalendarModal() {
+    $('#addNewSchCalendar_pname').val('');
+    $("#addNewSchCalendar_pcolor").spectrum({color: DEFAULT_COLOR});
 }

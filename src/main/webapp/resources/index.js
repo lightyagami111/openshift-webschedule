@@ -1,7 +1,5 @@
-/* global moment, textboxio */
+/* global moment, textboxio, textboxioNotes, selectedCalEvent, selectedView */
 
-var textboxioNotes;
-var selectedCalEvent;
 
 $(document).ready(function () {
 
@@ -15,74 +13,13 @@ $(document).ready(function () {
     });
 
 
-
-
-    //-------------------------------------
-    //load calendars
-    //-------------------------------------
-    var h = {
-        left: 'prev,next today',
-        center: 'title',
-        right: 'month,basicWeek,basicDay'
-    };
-    if (mobileCheck() === true) {
-        h = {
-            left: 'prev,next today month,basicWeek,basicDay title',
-            center: '',
-            right: 'title'
-        };
-    }
-    $('#calendar').fullCalendar({
-        header: h,
-        views: {
-            week: {
-                titleFormat: 'MMMM DD YYYY',
-                columnFormat: 'MMM DD ddd'
-            },
-            month: {
-                titleFormat: 'MMMM YYYY'
-            }
-        },
-        defaultView: 'basicWeek',
-        timeFormat: 'HH:mm',
-        displayEventEnd: true,
-        aspectRatio: mobileCheck() ? 1 : 1.35,
-        firstDay: 1,
-        selectable: true,
-        selectHelper: true,
-        select: function (start, end) {
-            var startD = start.local().toDate();
-            var endD = null;
-            if (end.diff(start, 'days') > 1) {
-                end.subtract(1, 'days');
-                endD = end.local().toDate();
-                endD = moment(endD).format('YYYY-MM-DD');
-            }
-            startD = moment(startD).format('YYYY-MM-DD');
-
-            showTaskInfoModal(null, startD, endD, false);
-        },
-        eventClick: function (calEvent, jsEvent, view) {
-            selectedCalEvent = calEvent;
-            showTaskInfoModal(calEvent.id, null, null, true);
-        },
-        events: function (start, end, timezone, callback) {
-            var startD = start.local().format('YYYY-MM-DD');
-            var endD = end.local().format('YYYY-MM-DD');
-
-            $('input[name="selectedView"]').val('calendar');
-            $('input[name="selectedValue"]').val(startD + ' - ' + endD);
-
-            loadEvents(startD, endD, function (result) {
-                callback(result);
-            });
-        }
+    loadCalendars(function (result) {
+        loadCalendarsAjaxCallback(result);        
     });
-    if (mobileCheck() === true) {
-        $('.fc-left h2').before('<br>');
-    }
+    
+    fullCalendarOptions();
 
-    $('#showCalendar').on('click', showCalendarWrapper);
+    
 
 
     //-------------------------------------
@@ -193,10 +130,7 @@ $(document).ready(function () {
 
     hideTasksWrapper();
     hideTaskInfo();
-    hideCalendarWrapper();
-
-    $('#showCalendar').click();
-    $('#showCalendar').removeClass('active');
+    showCalendarWrapper();
 
     if (mobileCheck() === false) {
         $('#page-wrapper').css({
@@ -225,23 +159,6 @@ $('.modal').on('hidden.bs.modal', function (e) {
 });
 
 
-
-
-function showCalendarWrapper() {
-    $('#calendar-wrapper').show(250);
-    $('#calendar').show(250);
-
-    hideTasksWrapper();
-    deselectProjectMenu();
-
-    var view = $('#calendar').fullCalendar('getView');
-    var startD = view.start.local().format('YYYY-MM-DD');
-    var endD = view.end.local().format('YYYY-MM-DD');
-    $('input[name="selectedView"]').val('calendar');
-    $('input[name="selectedValue"]').val(startD + ' - ' + endD);
-    $('#calendar').fullCalendar('option', 'contentHeight', "auto");
-
-}
 
 function hideCalendarWrapper() {
     $('#calendar-wrapper').hide();
@@ -331,9 +248,11 @@ function loadSchData(form, task_id, start, end) {
             loadSchDataAjaxCallback(form, taskData, null, null);
         });
     } else {
-        getDefaultProject(function (result) {
-            loadInitialTaskData(result.project_id, '#', start, end, false, null, function (taskData) {
-                loadSchDataAjaxCallback(form, taskData, null, null);
+        getDefaultCalendar(function(resultc) {
+            getDefaultProject(function (resultp) {
+                loadInitialTaskData(resultc.calendar_id, resultp.project_id, '#', start, end, false, null, function (taskData) {
+                    loadSchDataAjaxCallback(form, taskData, null, null);
+                });
             });
         });
     }
@@ -350,13 +269,13 @@ function loadSchDataAjaxCallback(form, taskData, fromRepeatTaskId, fromRepeatTas
         form.find('.delRTaskAll_Modal_Button').hide();
     }
 
-    if ($('input[name="selectedView"]').val() === 'calendar') {
+    if (selectedView === 'calendar') {
         form.find('.delRTaskCurrent_Modal_Button').show();
     } else {
         form.find('.delRTaskCurrent_Modal_Button').hide();
     }
 
-    if ($('input[name="selectedView"]').val() === 'calendar' && taskData.id === null) {
+    if (selectedView === 'calendar' && taskData.id === null) {
         form.find('#task_buttons').hide();
     } else {
         form.find('#task_buttons').show();
@@ -364,7 +283,7 @@ function loadSchDataAjaxCallback(form, taskData, fromRepeatTaskId, fromRepeatTas
         $('.delTask_id').val(taskData.id);
     }
     
-    if ($('input[name="selectedView"]').val() === 'calendar' && taskData.repeatData.dbExist === true) {
+    if (selectedView === 'calendar' && taskData.repeatData.dbExist === true) {
         form.find('.makeEditableCurrentTaskInfo').show();
     } else {
         form.find('.makeEditableCurrentTaskInfo').hide();
@@ -434,6 +353,9 @@ function loadSchDataAjaxCallback(form, taskData, fromRepeatTaskId, fromRepeatTas
 
 
     changeEditTaskParent(taskData.project_id, taskData.parent, taskData.id, taskData.parent_text);
+    
+    
+    form.find('.task_cal').val(taskData.calendar.id);
 
 
 
@@ -539,6 +461,8 @@ function saveSchData(form) {
     taskData.project_id = getEditTaskProject();
     taskData.parent = getTaskParent();
     taskData.parent_text = getTaskParentText(form);
+    
+    taskData.calendar_id = form.find('.task_cal').val();
 
     taskData.labels = null;
     var selectizeLabels = getSelectizeLabels(form);
@@ -575,7 +499,7 @@ function loadRepeatSchDataAjaxCallback(repeatData) {
     }
     else {
         mode_start = Date.now();
-        if ($('input[name="selectedView"]').val() === 'calendar') {
+        if (selectedView === 'calendar') {
             mode_start = moment(getDateFromPicker('start'),'YYYY-MM-DD').valueOf();
         }
     }

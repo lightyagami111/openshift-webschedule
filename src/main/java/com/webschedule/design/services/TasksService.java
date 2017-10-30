@@ -5,6 +5,7 @@
  */
 package com.webschedule.design.services;
 
+import com.webschedule.design.datastructure.CalendarEntity;
 import com.webschedule.design.datastructure.CalendarUIEventDTO;
 import com.webschedule.design.datastructure.GroupSortDTO;
 import com.webschedule.design.datastructure.GroupSortEntity;
@@ -195,11 +196,12 @@ public class TasksService {
         return result;
     }
 
-    public TaskRequestLoadDTO loadInitialTaskData(ProjectEntity findProjectById, String parent_id, Boolean insert, Long[] labels, Date start, Date end) {
+    public TaskRequestLoadDTO loadInitialTaskData(CalendarEntity findCalendarById, ProjectEntity findProjectById, String parent_id, Boolean insert, Long[] labels, Date start, Date end) {
         TaskRequestLoadDTO result = new TaskRequestLoadDTO();
 
         TaskEntity t = new TaskEntity();
         t.setProject(findProjectById);
+        t.setCalendar(findCalendarById);
 
         t.setParent(parent_id);
         if (!parent_id.equals("#")) {
@@ -229,7 +231,7 @@ public class TasksService {
         return result;
     }
 
-    public void saveTaskData(TaskRequestSaveDTO dTO, ProjectEntity project) throws ParseException {
+    public void saveTaskData(TaskRequestSaveDTO dTO, ProjectEntity project, CalendarEntity calendar) throws ParseException {
         TaskEntity t;
         if (dTO.getId() != null) {
             t = daoService.findTaskById(dTO.getId());
@@ -280,6 +282,7 @@ public class TasksService {
         t.setParent(dTO.getParent());
         t.setParent_text(dTO.getParent_text());
         t.setProject(project);
+        t.setCalendar(calendar);
         t.setNotes(dTO.getNotes());
         t.setPriority(dTO.getPriority());        
 
@@ -405,7 +408,7 @@ public class TasksService {
             d.setAllDay(f.getAllDay());
             d.setStart(Utils.format(f.getStart()));
             d.setEnd(Utils.format(f.getEnd()));
-            d.setColor(f.getProject_color());
+            d.setColor(f.getCalendar().getBckgColor());
             
             res.add(d);
         }

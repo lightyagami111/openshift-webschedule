@@ -89,8 +89,8 @@ public class RepeatableService {
     private CalendarUIEventDTO createCalendarUIEventDTO(Date now, TaskRepeatDataEntity rep, TaskEntity f) {
         CalendarUIEventDTO d = new CalendarUIEventDTO();
         d.setId(f.getId());
-        d.setTitle(f.getText());
-        d.setColor(f.getProject_color());
+        d.setTitle("® " + f.getText());
+        d.setColor(f.getCalendar().getBckgColor());
 
         d.setAllDay(rep.getAllDay());
         if (rep.getAllDay()) {

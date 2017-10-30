@@ -64,11 +64,19 @@
                         </ul>                        
                     </li>
 
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">
+                            <i class="fa fa-calendar-check-o"></i> <i class="fa fa-caret-down"></i>
+                        </a>
+                        <ul class="dropdown-menu" id="selectedCalendars">
+
+                        </ul> 
+                    </li>                
                     <li>
                         <a href="#" class="btn" role="button" id="showCalendar">
-                            <i class="fa fa-bell fa-fw"></i>
+                            <i class="fa fa-calendar"></i>
                         </a> 
-                    </li>                
+                    </li>  
                     <a href="/WebSchedule/m" class="btn btn-default" role="button">manage</a>
                 </ul>     
 
@@ -82,9 +90,6 @@
             </nav>
 
             <div id="page-wrapper">
-
-                <input type="hidden" name="selectedView">
-                <input type="hidden" name="selectedValue">
 
                 <div id="tasks-wrapper">
                     <div class="row">
@@ -194,6 +199,7 @@
         <script src="resources/indexGroupAndSort.js?1575"></script>
         <script src="resources/indexProjectsMenu.js?1574"></script>        
         <script src="resources/indexTaskLists.js?1574"></script>
-
+        <script src="resources/indexCalendars.js?1575"></script>
+        
     </body>
 </html>

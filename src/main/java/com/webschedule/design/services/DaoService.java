@@ -6,6 +6,7 @@
 package com.webschedule.design.services;
 
 import ch.lambdaj.Lambda;
+import com.webschedule.design.datastructure.CalendarEntity;
 import com.webschedule.design.datastructure.EventException;
 import com.webschedule.design.datastructure.GroupSortEntity;
 import com.webschedule.design.datastructure.LabelEntity;
@@ -17,7 +18,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
@@ -93,6 +93,67 @@ public class DaoService {
         findProjectById.setDefaultProject(Boolean.TRUE);
         updateProject(findProjectById);
     }
+    
+    //--------------------------------------------------------------------------
+    // CALENDARS
+    //--------------------------------------------------------------------------
+    public void persist(CalendarEntity ce) {
+        getCurrentSession().persist(ce);
+    }
+    
+    public void update(CalendarEntity ce) {
+        getCurrentSession().merge(ce);
+    }
+    
+    public List<CalendarEntity> findAll() {
+        return getCurrentSession().createQuery("SELECT ce FROM CalendarEntity ce").list();
+    }
+    
+    public List<CalendarEntity> findSelected() {
+        return getCurrentSession().createQuery("SELECT ce FROM CalendarEntity ce WHERE ce.selected = true").list();
+    }
+    
+    public CalendarEntity findById(Long id) {
+        return (CalendarEntity) getCurrentSession()
+                .createQuery("SELECT ce FROM CalendarEntity ce WHERE ce.id = :_id")
+                .setParameter("_id", id)
+                .uniqueResult();
+    }
+    
+    public void delete(Long id) {
+        CalendarEntity findDefaultCalendar = findDefaultCalendar();
+        getCurrentSession()
+                .createQuery("UPDATE TaskEntity t SET t.calendar = :_cal WHERE t.calendar.id = :_id")
+                .setParameter("_id", id)
+                .setParameter("_cal", findDefaultCalendar)
+                .executeUpdate();
+        CalendarEntity ce = findById(id);
+        getCurrentSession().delete(ce);
+    }
+    
+    
+    public CalendarEntity findDefaultCalendar() {
+        CalendarEntity p = null;
+        List list = getCurrentSession().createQuery("SELECT p FROM CalendarEntity p WHERE p.defaultCalendar = TRUE").list();
+        if (list != null && !list.isEmpty()) {
+            p = (CalendarEntity) list.get(0);
+        }
+        return p;
+    }
+
+    public void setDefaultCalendar(Long id) {
+        List<CalendarEntity> findAllCalendars = findAll();
+        for (CalendarEntity findAllCalendar : findAllCalendars) {
+            findAllCalendar.setDefaultCalendar(Boolean.FALSE);
+            update(findAllCalendar);
+        }
+
+        CalendarEntity findCalendarById = findById(id);
+        findCalendarById.setDefaultCalendar(Boolean.TRUE);
+        findCalendarById.setSelected(Boolean.TRUE);
+        update(findCalendarById);
+    }
+    
 
     //--------------------------------------------------------------------------
     // LABELS
@@ -205,7 +266,13 @@ public class DaoService {
     }
 
     public List<TaskRepeatDataEntity> findRepeatableTasks() {
-        return getCurrentSession().createQuery("SELECT p FROM TaskRepeatDataEntity p").list();
+        List<CalendarEntity> findSelected = findSelected();
+        List<Long> findSelectedIds = Lambda.extract(findSelected, Lambda.on(CalendarEntity.class).getId());
+        findSelectedIds.add(Long.MIN_VALUE);
+        return getCurrentSession()
+                .createQuery("SELECT p FROM TaskRepeatDataEntity p WHERE p.task.calendar.id IN (:_findSelectedIds)")
+                .setParameterList("_findSelectedIds", findSelectedIds)
+                .list();
     }
 
     public void deleteCurrentEvent(Long task_id, Date date) {
@@ -262,12 +329,17 @@ public class DaoService {
     // EVENTS
     //--------------------------------------------------------------------------
     public List<TaskEntity> findTasksBetween(Date start, Date end) {
+        List<CalendarEntity> findSelected = findSelected();
+        List<Long> findSelectedIds = Lambda.extract(findSelected, Lambda.on(CalendarEntity.class).getId());
+        findSelectedIds.add(Long.MIN_VALUE);
         return getCurrentSession()
                 .createQuery("SELECT p FROM TaskEntity p"
-                        + " WHERE (p.start BETWEEN :_start and :_end) OR (p.end BETWEEN :_start and :_end)"
-                        + " OR (:_start BETWEEN p.start and p.end) OR (:_end BETWEEN p.start and p.end)")
+                        + " WHERE ((p.start BETWEEN :_start and :_end) OR (p.end BETWEEN :_start and :_end)"
+                        + " OR (:_start BETWEEN p.start and p.end) OR (:_end BETWEEN p.start and p.end))"
+                        + " AND p.calendar.id IN (:_findSelectedIds)")
                 .setParameter("_start", start)
                 .setParameter("_end", end)
+                .setParameterList("_findSelectedIds", findSelectedIds)
                 .list();
     }
     

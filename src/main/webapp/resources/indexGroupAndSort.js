@@ -1,3 +1,5 @@
+/* global selectedView, selectedValue */
+
 function loadGroupAndSort() {
     
     $('.page-header .dropdown-menu li').on('click', function () {                
@@ -28,20 +30,17 @@ function disableItem() {
         $('#sort-sdate-down').parents('li').show();
     }
     
-    var view = $('input[name="selectedView"]').val();
-    if (view === 'projects') {
+    if (selectedView === 'projects') {
         $('#group-project').parents('li').hide();
         $('#group-label').parents('li').show();
-    } else if (view === 'labels') {
+    } else if (selectedView === 'labels') {
         $('#group-label').parents('li').hide();
         $('#group-project').parents('li').show();
     }
 }
 function setGroupAndSort() {
-    var value = $('input[name="selectedValue"]').val();
-    var view = $('input[name="selectedView"]').val();
 
-    findGS(view, value, function (result) {
+    findGS(selectedView, selectedValue, function (result) {
         $('.ulGroup').children().find('.gsli').removeClass('glyphicon-ok-circle');
         $('.ulSort').children().find('.gsli').removeClass('glyphicon-ok-circle');
         $('#' + result.sort_).addClass('glyphicon-ok-circle');
@@ -49,12 +48,10 @@ function setGroupAndSort() {
         disableItem();
     });
 }
-function saveGroupAndSort(group_, sort_) {
-    var value_ = $('input[name="selectedValue"]').val();
-    var view_ = $('input[name="selectedView"]').val();
+function saveGroupAndSort(group_, sort_) {        
     saveOrUpdateGS({
-        view: view_,
-        id: value_,
+        view: selectedView,
+        id: selectedValue,
         group: group_,
         sort: sort_
     }, function () {

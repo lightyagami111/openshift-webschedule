@@ -39,6 +39,10 @@ public class TaskEntity implements Serializable {
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private ProjectEntity project;
     
+    @ManyToOne(fetch = FetchType.EAGER)
+    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    private CalendarEntity calendar;
+    
     private String text;
     private String parent;
     private String parent_text;
@@ -111,9 +115,13 @@ public class TaskEntity implements Serializable {
     public String getProject_text() {
         return project.getText();
     }
-    
-    public String getProject_color() {
-        return project.getBckgColor();
+
+    public CalendarEntity getCalendar() {
+        return calendar;
+    }
+
+    public void setCalendar(CalendarEntity calendar) {
+        this.calendar = calendar;
     }
 
     public String getNotes() {

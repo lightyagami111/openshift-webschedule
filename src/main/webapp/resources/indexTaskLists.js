@@ -1,4 +1,4 @@
-/* global moment */
+/* global moment, selectedView, selectedValue */
 
 var task_list_template = $('#tasks_list_template').html();
 
@@ -217,16 +217,16 @@ function saveNewTask(parent_id, title) {
         parent_id = '#';
     }
 
-    if ($('input[name="selectedView"]').val() === 'projects') {
-        loadInitialTaskDataAjax($('input[name="selectedValue"]').val(), parent_id, title, null);
+    if (selectedView === 'projects') {
+        loadInitialTaskDataAjax(selectedValue, parent_id, title, null);
     } else { //selectedView is labels
         if (parent_id === '#') {
             getDefaultProject(function (result) {
-                loadInitialTaskDataAjax(result.project_id, parent_id, title, [$('input[name="selectedValue"]').val()]);
+                loadInitialTaskDataAjax(result.project_id, parent_id, title, [selectedValue]);
             });
         } else {
             getParentTaskProject(parent_id, function (result) {
-                loadInitialTaskDataAjax(result.parent_project_id, parent_id, title, [$('input[name="selectedValue"]').val()]);
+                loadInitialTaskDataAjax(result.parent_project_id, parent_id, title, [selectedValue]);
             });
         }
     }
@@ -234,9 +234,11 @@ function saveNewTask(parent_id, title) {
 }
 
 function loadInitialTaskDataAjax(project_id, parent_id, title, labels) {
-    loadInitialTaskData(project_id, parent_id, null, null, true, labels, function (result) {
-        updateTaskTitle(result.id, title, function () {
-            refreshData();
+    getDefaultCalendar(function(resultc) {
+        loadInitialTaskData(resultc.calendar_id, project_id, parent_id, null, null, true, labels, function (result) {
+            updateTaskTitle(result.id, title, function () {
+                refreshData();
+            });
         });
     });
 }

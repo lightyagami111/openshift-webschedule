@@ -19,6 +19,7 @@ public class TaskRequestSaveDTO implements Serializable {
     private String parent;
     private String parent_text;
     private Long project_id;
+    private Long calendar_id;
     private String project_text;
     private String notes;
     private String start;
@@ -77,6 +78,14 @@ public class TaskRequestSaveDTO implements Serializable {
 
     public void setProject_text(String project_text) {
         this.project_text = project_text;
+    }
+
+    public Long getCalendar_id() {
+        return calendar_id;
+    }
+
+    public void setCalendar_id(Long calendar_id) {
+        this.calendar_id = calendar_id;
     }
 
     public String getNotes() {

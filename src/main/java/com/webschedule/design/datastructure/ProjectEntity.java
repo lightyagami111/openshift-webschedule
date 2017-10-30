@@ -35,9 +35,6 @@ public class ProjectEntity implements Serializable {
     @Length(max = 255)
     private String parent;
     
-    @Length(max = 255)
-    private String bckgColor;
-    
     private Boolean defaultProject = false;
     
     
@@ -64,14 +61,6 @@ public class ProjectEntity implements Serializable {
 
     public void setParent(String parent) {
         this.parent = parent;
-    }
-
-    public String getBckgColor() {
-        return bckgColor;
-    }
-
-    public void setBckgColor(String bckgColor) {
-        this.bckgColor = bckgColor;
     }
 
     public Boolean getDefaultProject() {

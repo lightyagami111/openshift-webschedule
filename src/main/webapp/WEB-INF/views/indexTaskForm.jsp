@@ -35,7 +35,12 @@
             <button type="button" class="btn btn-primary repeatTask_Modal_Button" data-toggle="modal" data-target="#repeatTask_Modal">Repeat</button>
         </div>
 
-        <br><br>
+        <br>
+        <div class="form-group">
+            <label>Calendar : </label>
+            <select class="task_cal"></select>
+        </div> 
+        <br>
         <div class="form-group">
             <label>Priority : </label>
             <select class="task_prio">

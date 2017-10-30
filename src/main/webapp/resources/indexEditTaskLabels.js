@@ -2,19 +2,34 @@ var selectizeDesktop;
 var selectizeModal;
 
 function loadLabelsAjaxCallback(data_labels) {
-    fillDropdown($('#sch_labels'), data_labels, function (data) {
+    fillDropdownLabel($('#sch_labels'), data_labels, function (data) {
         showTasksWrapper();
         hideCalendarWrapper();
         deselectProjectMenu();
 
-        $('input[name="selectedView"]').val('labels');
-        $('input[name="selectedValue"]').val($(this).attr('data-id'));
+        selectedView = 'labels';
+        selectedValue = $(this).attr('data-id');
         setGroupAndSort();
         refreshData();
     });
 
     selectizeDesktop = selectizeLabels('#formBodyDesktop form fieldset .labels .labels-sch', data_labels);
     selectizeMobile = selectizeLabels('#formBodyModal form fieldset .labels .labels-sch', data_labels);
+}
+
+
+function fillDropdownLabel(ulElemnt, data, functionOnClick) {
+    var dropdownElHtmlDivider = $('#label_item_menu_template_1').html();
+    var dropdownElHtml = $('#label_item_menu_template_0').html();
+    for (var j = 0; j < data.length; j++) {
+        var newSdropdownElHtml = (j > 0) ? $(dropdownElHtmlDivider) : $(dropdownElHtml);
+        newSdropdownElHtml.attr('data-id', data[j].id);
+        newSdropdownElHtml.on('click', functionOnClick);
+        newSdropdownElHtml.find('strong').prepend(data[j].text);
+        $(newSdropdownElHtml).find('strong').css('font-size', '17px');
+
+        ulElemnt.append(newSdropdownElHtml);
+    }
 }
 
 function selectizeLabels(inputId, data) {

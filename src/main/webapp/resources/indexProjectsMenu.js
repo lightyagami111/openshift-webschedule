@@ -1,4 +1,3 @@
-/* global DEFAULT_COLOR */
 
 function loadProjectsMenu(data_projects) {
 
@@ -18,19 +17,19 @@ function loadProjectsMenu(data_projects) {
         showTasksWrapper();
         hideCalendarWrapper();
 
-        $('input[name="selectedView"]').val('projects');
-        $('input[name="selectedValue"]').val(project_id);
+        selectedView = 'projects';
+        selectedValue = project_id;
         setGroupAndSort();
         refreshData();
     });
 
     $('#side-menu').on('loaded.jstree', function () {
         ($(this)).jstree('open_all');
-        colorizefIterate(data_projects);
+        node_css_iterate(data_projects);
     });
 
     $('#side-menu').on('open_node.jstree', function () {
-        colorizefIterate(data_projects);
+        node_css_iterate(data_projects);
     });
 
 
@@ -48,22 +47,17 @@ function loadProjectsMenu(data_projects) {
 
 
 
-function colorizefIterate(data_projects) {
+function node_css_iterate(data_projects) {
     $('#side-menu li').each(function (index, element) {
-        colorizeF(data_projects, element);
+        node_css(element);
     });
 }
 
 
-function colorizeF(data_projects, element) {
+function node_css(element) {
     var id = $(element).attr('id');
     var a = $(element).find('a[id="'+id+'_anchor"]');
     if (a.hasClass('color-box-text') === false) {
-        var project = getProjectByid_loaded(data_projects, id);
-        var bckgColor = project.bckgColor;
-        if (bckgColor !== null && bckgColor.toUpperCase() !== DEFAULT_COLOR) {
-            a.css('background-color', bckgColor);
-        }
         a.addClass('color-box-text');
     }
 }

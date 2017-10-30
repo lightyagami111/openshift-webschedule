@@ -1,4 +1,6 @@
 
+/* global $c */
+
 var _csrf = null;
 
 $(document).ready(function () {
@@ -28,12 +30,137 @@ function getTitleFromUrlLink(body, callback) {
 
 
 
+
+
+
+function loadCalendars(callback) {
+    jQuery.ajax({
+        type: "GET",
+        url: '/WebSchedule/loadCalendars',
+        success: function (result) {
+            callback(result);
+        },
+        error: function (xhr) {
+            errorMessage(xhr);
+        }
+    });
+}
+
+function getCalendarByid(calendar_id, callback) {
+    jQuery.ajax({
+        type: "GET",
+        url: '/WebSchedule/getCalendarByid',
+        processData: false,
+        data: "id=" + calendar_id,
+        success: function (result) {
+            callback(result);
+        },
+        error: function (xhr) {
+            errorMessage(xhr);
+        }
+    });
+}
+
+function addNewCalendar(pdata, callback) {
+    jQuery.ajax({
+        type: "POST",
+        url: '/WebSchedule/addNewCalendar' + _csrf,
+        data: JSON.stringify(pdata),
+        contentType: 'application/json; charset=UTF-8',
+        success: function (result) {
+            callback(result);
+        },
+        error: function (xhr) {
+            errorMessage(xhr);
+        }
+    });
+}
+
+function updateCalendar(pdata, callback) {
+    jQuery.ajax({
+        type: "PUT",
+        url: '/WebSchedule/updateCalendar' + _csrf,
+        data: JSON.stringify(pdata),
+        contentType: 'application/json; charset=UTF-8',
+        success: function (result) {
+            callback(result);
+        },
+        error: function (xhr) {
+            errorMessage(xhr);
+        }
+    });
+}
+
+function deleteCalendar(id, callback) {
+    jQuery.ajax({
+        type: "DELETE",
+        url: '/WebSchedule/deleteCalendar' + _csrf + "&id=" + id,
+        success: function (result) {
+            callback(result);
+        },
+        error: function (xhr) {
+            errorMessage(xhr);
+        }
+    });
+}
+
+
+function getDefaultCalendar(callback) {
+    jQuery.ajax({
+        type: "GET",
+        url: '/WebSchedule/getDefaultCalendar',
+        success: function (result) {
+            callback(result);
+        },
+        error: function (xhr) {
+            errorMessage(xhr);
+        }
+    });
+}
+
+
+function setDefaultCalendar(calendar_id, callback) {
+    jQuery.ajax({
+        type: "PUT",
+        url: '/WebSchedule/setDefaultCalendar' + _csrf + "&id=" + calendar_id,
+        success: function (result) {
+            callback(result);
+        },
+        error: function (xhr) {
+            errorMessage(xhr);
+        }
+    });
+}
+
+function setSelectedCalendar(selectedC, callback) {
+    var selectedC_p = '';
+    for(var i=0; i<selectedC.length; i++) {
+        selectedC_p = selectedC_p + '&ids=' + selectedC[i];
+    }
+    
+    jQuery.ajax({
+        type: "PUT",
+        url: '/WebSchedule/setSelectedCalendar' + _csrf + selectedC_p,
+        success: function (result) {
+            callback(result);
+        },
+        error: function (xhr) {
+            errorMessage(xhr);
+        }
+    });
+}
+
+
+
 function loadEvents(start, end, callback) {
     jQuery.ajax({
         type: "GET",
         url: '/WebSchedule/loadEvents',
         data: "start=" + start + "&end=" + end,
         success: function (result) {
+            for(var t=0; t<result.length; t++){
+                result[t].textColor = $c.complement(result[t].color);
+            }
             callback(result);
         },
         error: function (xhr) {
@@ -145,7 +272,7 @@ function getParentTaskProject(parent_id, callback) {
     });
 }
 
-function loadInitialTaskData(project_id, parent_id, selectedStart, selectedEnd, insert, labels, callback) {
+function loadInitialTaskData(calendar_id, project_id, parent_id, selectedStart, selectedEnd, insert, labels, callback) {
     var sParentid = "";
     if (parent_id !== null) {
         if (parent_id === '#') {
@@ -155,6 +282,7 @@ function loadInitialTaskData(project_id, parent_id, selectedStart, selectedEnd, 
     }
 
     var sProject = "&project_id=" + project_id;
+    var sCal = "&calendar_id=" + calendar_id;
     var sInsert = "&insert=" + insert;
 
     var sLabels = "";
@@ -179,7 +307,7 @@ function loadInitialTaskData(project_id, parent_id, selectedStart, selectedEnd, 
     jQuery.ajax({
         type: "GET",
         url: '/WebSchedule/loadInitialTaskData',
-        data: sParentid + sStart + sEnd + sProject + sInsert + sLabels,
+        data: sParentid + sStart + sEnd + sProject + sCal + sInsert + sLabels,
         success: function (result) {
             callback(result);
         },

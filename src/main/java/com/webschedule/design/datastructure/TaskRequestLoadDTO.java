@@ -17,6 +17,7 @@ public class TaskRequestLoadDTO {
     
     private Long id;
     private ProjectEntity project;
+    private CalendarEntity calendar;
     private String text;
     private String parent;
     private String parent_text;
@@ -49,13 +50,17 @@ public class TaskRequestLoadDTO {
     public String getProject_text() {
         return project.getText();
     }
-    
-    public String getProject_color() {
-        return project.getBckgColor();
-    }
 
     public void setProject(ProjectEntity project) {
         this.project = project;
+    }
+
+    public CalendarEntity getCalendar() {
+        return calendar;
+    }
+
+    public void setCalendar(CalendarEntity calendar) {
+        this.calendar = calendar;
     }
 
     public String getText() {

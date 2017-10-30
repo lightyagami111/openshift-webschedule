@@ -33,7 +33,7 @@
 
 
     <body>
-        
+
         <input type="hidden" id="_csrf" name="${_csrf.parameterName}" value="${_csrf.token}"/> 
 
         <div id="wrapper">
@@ -47,16 +47,7 @@
                             <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#deleteProject_Modal">Delete</button>                            
                         </div>
 
-                        <br><br><br>
-
-                        <h3>LABELS :</h3>
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#addNewSchLabel_Modal">Add</button>
-                            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#updateSchLabel_Modal">Update</button>
-                            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#deleteSchLabel_Modal">Delete</button>                            
-                        </div>
-                        
-                        <br><br><br>
+                        <br><br>                    
 
                         <h3>Default project :</h3>
                         <div class="form-group">
@@ -65,6 +56,33 @@
                             </select>
                         </div>
 
+                        <br><br>
+
+                        <h3>LABELS :</h3>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#addNewSchLabel_Modal">Add</button>
+                            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#updateSchLabel_Modal">Update</button>
+                            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#deleteSchLabel_Modal">Delete</button>                            
+                        </div>
+
+                        <br><br><br>
+
+                        <h3>CALENDARS :</h3>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#addNewCalendar_Modal">Add</button>
+                            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#updateCalendar_Modal">Update</button>
+                            <button type="button" class="btn btn-primary btn-lg" data-toggle="modal" data-target="#deleteCalendar_Modal">Delete</button>                            
+                        </div>
+
+                        <br><br>
+                        
+                        <h3>Default calendar :</h3>
+                        <div class="form-group">
+                            <select class="form-control" id="defaultSchCalendar_p">
+                                <option value="null">N/A</option>
+                            </select>
+                        </div>
+                        
                         <br><br><br>
 
                         <a href="/WebSchedule/" class="btn btn-default" role="button">BACK</a>
@@ -93,8 +111,6 @@
                                 <label for="pname">Name:</label>
                                 <br>
                                 <input type="text" class="form-control" id="addNewSchProject_pname" style="width:80%; float: left;">
-                                &nbsp;&nbsp;
-                                <input type="text" class="form-control" id="addNewSchProject_pcolor" style="float: right;">
                                 <br>
                                 <br>
                                 <label for="sel1" style="float: left;">Select parent:</label>
@@ -146,6 +162,39 @@
 
 
 
+            <div id="addNewCalendar_Modal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">New calendar</h4>
+                        </div>
+
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="pname">Name:</label>
+                                <br>
+                                <input type="text" class="form-control" id="addNewSchCalendar_pname" style="width:80%; float: left;">
+                                &nbsp;&nbsp;
+                                <input type="text" class="form-control" id="addNewSchCalendar_pcolor" style="float: right;">
+                                <br>
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-default pull-left" id="addNewCalendar_Modal_c">Create</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+
 
 
 
@@ -174,8 +223,6 @@
                                         <label for="pname">Name:</label>
                                         <br>
                                         <input type="text" class="form-control" id="updateSchProject_pname_new" style="width:80%; float: left;">
-                                        &nbsp;&nbsp;
-                                        <input type="text" class="form-control" id="updateSchProject_pcolor" style="float: right;">
                                         <br>
                                         <br>
                                         <label for="sel1" style="float: left;">Select parent:</label>
@@ -231,6 +278,50 @@
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             <button type="button" class="btn btn-default pull-left" id="updateSchLabel_Modal_c">Update</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+
+
+            <div id="updateCalendar_Modal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Update calendar</h4>
+                        </div>
+
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <select class="form-control" id="updateSchCalendar_p">
+                                    <option value="null">N/A</option>
+                                </select>
+                            </div>
+                            <div class="form-group">  
+                                <form>
+                                    <fieldset disabled="disabled">
+                                        <input type="hidden" id="updateCalendar_Modal_id" value="">
+                                        <label for="pname">Name:</label>
+                                        <br>
+                                        <input type="text" class="form-control" id="updateSchCalendar_pname_new" style="width:80%; float: left;">
+                                        &nbsp;&nbsp;
+                                        <input type="text" class="form-control" id="updateSchCalendar_pcolor" style="float: right;">
+                                        <br>
+                                    </fieldset>                                    
+                                </form>                                                                
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-default pull-left" id="updateCalendar_Modal_c">Update</button>
                         </div>
                     </div>
 
@@ -316,8 +407,48 @@
 
                 </div>
             </div>  
-            
-            
+
+
+
+            <div id="deleteCalendar_Modal" class="modal fade" role="dialog">
+                <div class="modal-dialog">
+
+                    <!-- Modal content-->
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Delete calendar & all sub-calendars & all tasks</h4>
+                        </div>
+
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <select class="form-control" id="deleteSchCalendar_p">
+                                    <option value="null">N/A</option>
+                                </select>
+                            </div>
+                            <div class="form-group">  
+                                <form>
+                                    <fieldset disabled="disabled">
+                                        <input type="hidden" id="deleteCalendar_Modal_id" value="">
+                                        <label for="pname">Type DELETE : </label>
+                                        <br>
+                                        <input type="text" class="form-control" id="deleteSchCalendar_pname_new" style="width:80%; float: left;">                                        
+                                    </fieldset>                                    
+                                </form>                                                                
+                            </div>
+
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-default pull-left" id="deleteCalendar_Modal_c">Delete</button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
             <jsp:include page="errorModal.jsp" />
 
 

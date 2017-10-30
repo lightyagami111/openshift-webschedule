@@ -1,4 +1,11 @@
+/* global refreshTasksListsCallback, moment */
+
 var DEFAULT_COLOR = "#3A7EAD";
+var textboxioNotes;
+var selectedCalEvent;
+var selectedView;
+var selectedValue;
+var selectedCalendarsId;
 
 //returns a true or false value depending on whether or not the user is browsing with a mobile.
 function mobileCheck() {
@@ -18,20 +25,30 @@ function makeid() {
 }
 
 
+function removeA(arr) {
+    var what, a = arguments, L = a.length, ax;
+    while (L > 1 && arr.length) {
+        what = a[--L];
+        while ((ax= arr.indexOf(what)) !== -1) {
+            arr.splice(ax, 1);
+        }
+    }
+    return arr;
+}
+
+
 
 
 function refreshData() {
-    var value = $('input[name="selectedValue"]').val();
-    var view = $('input[name="selectedView"]').val();
 
     hideTaskInfo();
 
-    if (view === 'projects') {
-        loadTasksByProjectByGroup(value, refreshTasksListsCallback);
-    } else if (view === 'labels') {
-        loadTasksByLabel(value, refreshTasksListsCallback);
-    } else if (view === 'calendar') {
-        var res = value.split(" - ");
+    if (selectedView === 'projects') {
+        loadTasksByProjectByGroup(selectedValue, refreshTasksListsCallback);
+    } else if (selectedView === 'labels') {
+        loadTasksByLabel(selectedValue, refreshTasksListsCallback);
+    } else if (selectedView === 'calendar') {
+        var res = selectedValue.split(" - ");
         var start = moment(res[0], 'YYYY-MM-DD').format('YYYY-MM-DD');
         var end = moment(res[1], 'YYYY-MM-DD').format('YYYY-MM-DD');
         loadEvents(start, end, function (result) {
@@ -59,21 +76,3 @@ function jsTreeDisableCheckboxes(jsTreeInst, node_id) {
 
 
 
-
-
-
-var dropdownElHtmlDivider = $('#label_item_menu_template_1').html();
-
-var dropdownElHtml = $('#label_item_menu_template_0').html();
-
-function fillDropdown(ulElemnt, data, functionOnClick) {
-    for (var j = 0; j < data.length; j++) {
-        var newSdropdownElHtml = (j > 0) ? $(dropdownElHtmlDivider) : $(dropdownElHtml);
-        newSdropdownElHtml.attr('data-id', data[j].id);
-        newSdropdownElHtml.on('click', functionOnClick);
-        newSdropdownElHtml.find('strong').prepend(data[j].text);
-        $(newSdropdownElHtml).find('strong').css('font-size', '17px');
-
-        ulElemnt.append(newSdropdownElHtml);
-    }
-}

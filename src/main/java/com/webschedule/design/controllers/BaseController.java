@@ -1,5 +1,6 @@
 package com.webschedule.design.controllers;
 
+import com.webschedule.design.datastructure.CalendarEntity;
 import com.webschedule.design.datastructure.CalendarUIEventDTO;
 import com.webschedule.design.datastructure.GroupSortDTO;
 import com.webschedule.design.datastructure.GroupSortEntity;
@@ -174,7 +175,7 @@ public class BaseController {
     @RequestMapping(value = {"/getDefaultProject"}, method = RequestMethod.GET)
     public @ResponseBody
     Map getDefaultProject() {
-        String res = "";
+        String res = "null";
         ProjectEntity findDefaultProject = daoService.findDefaultProject();
         if (findDefaultProject != null) {
             res = findDefaultProject.getId().toString();
@@ -212,12 +213,88 @@ public class BaseController {
 
     @RequestMapping(value = {"/deleteProject"}, method = RequestMethod.DELETE)
     public ResponseEntity deleteProject(@RequestParam(value = "id") Long id) {
+        ProjectEntity findProjectById = daoService.findProjectById(id);
+        if (findProjectById.getDefaultProject()) {
+            return new ResponseEntity(">> default project can't be deleted!", HttpStatus.CONFLICT);
+        }
         if (daoService.countTasksById(id) > 0) {
             return new ResponseEntity(">> this project can't be deleted. Please delete project tasks first!", HttpStatus.CONFLICT);
         }
         daoService.deleteProject(id);
 
         return new ResponseEntity(HttpStatus.OK);
+    }
+    
+    
+    //--------------------------------------------------------------------------
+    // CALENDARS
+    //--------------------------------------------------------------------------
+    @RequestMapping(value = {"/loadCalendars"}, method = RequestMethod.GET)
+    public @ResponseBody
+    List<CalendarEntity> loadCalendars() {
+        return daoService.findAll();
+    }
+    
+    @RequestMapping(value = {"/getCalendarByid"}, method = RequestMethod.GET)
+    public @ResponseBody
+    CalendarEntity getCalendarByid(@RequestParam(value = "id") Long id) {
+        return daoService.findById(id);
+    }
+
+    @RequestMapping(value = {"/addNewCalendar"}, method = RequestMethod.POST)
+    public @ResponseBody
+    CalendarEntity addNewCalendar(@RequestBody CalendarEntity dto) {
+        daoService.persist(dto);
+        return dto;
+    }
+
+    @RequestMapping(value = {"/updateCalendar"}, method = RequestMethod.PUT)
+    public @ResponseBody
+    CalendarEntity updateCalendar(@RequestBody CalendarEntity dto) {
+        daoService.update(dto);
+        return dto;
+    }
+
+    @RequestMapping(value = {"/deleteCalendar"}, method = RequestMethod.DELETE)
+    public ResponseEntity deleteCalendar(@RequestParam(value = "id") Long id) {
+        CalendarEntity findById = daoService.findById(id);
+        if (findById.getDefaultCalendar()) {
+            return new ResponseEntity(">> default calendar can't be deleted!", HttpStatus.CONFLICT);
+        }
+        daoService.delete(id);
+        return new ResponseEntity(HttpStatus.OK);
+    }
+    
+    @RequestMapping(value = {"/getDefaultCalendar"}, method = RequestMethod.GET)
+    public @ResponseBody
+    Map getDefaultCalendar() {
+        String res = "null";
+        CalendarEntity findDefaultCalendar = daoService.findDefaultCalendar();
+        if (findDefaultCalendar != null) {
+            res = findDefaultCalendar.getId().toString();
+        }
+        return Utils.mapOf("calendar_id", res);
+    }
+
+    @ResponseStatus(HttpStatus.OK)
+    @RequestMapping(value = {"/setDefaultCalendar"}, method = RequestMethod.PUT)
+    public void setDefaultCalendar(@RequestParam(value = "id") Long id) {
+        daoService.setDefaultCalendar(id);
+    }
+    
+    @ResponseStatus(HttpStatus.OK)
+    @RequestMapping(value = {"/setSelectedCalendar"}, method = RequestMethod.PUT)
+    public void setSelectedCalendars(@RequestParam(value = "ids") List<Long> ids) {
+        List<CalendarEntity> findAll = daoService.findAll();
+        for (CalendarEntity ce : findAll) {
+            if (ids.contains(ce.getId())) {
+                ce.setSelected(Boolean.TRUE);
+            }
+            else {
+                ce.setSelected(Boolean.FALSE);
+            }
+            daoService.update(ce);
+        }
     }
 
     //--------------------------------------------------------------------------
@@ -278,6 +355,7 @@ public class BaseController {
     @RequestMapping(value = {"/loadInitialTaskData"}, method = RequestMethod.GET)
     public @ResponseBody
     ResponseEntity loadInitialTaskData(
+            @RequestParam(value = "calendar_id") Long calendar_id,
             @RequestParam(value = "project_id") Long project_id,
             @RequestParam(value = "parent_id") String parent_id,
             @RequestParam(value = "insert") Boolean insert,
@@ -287,9 +365,13 @@ public class BaseController {
     ) {
         ProjectEntity findProjectById = daoService.findProjectById(project_id);
         if (findProjectById == null) {
-            return new ResponseEntity("Default project not found (project_id=" + project_id + ")", HttpStatus.NOT_FOUND);
+            return new ResponseEntity("Project not found (project_id=" + project_id + ")", HttpStatus.NOT_FOUND);
         }
-        TaskRequestLoadDTO t = tasksService.loadInitialTaskData(findProjectById, parent_id, insert, labels, start, end);
+        CalendarEntity findCalendarById = daoService.findById(calendar_id);
+        if (findCalendarById == null) {
+            return new ResponseEntity("Calendar not found (calendar_id=" + calendar_id + ")", HttpStatus.NOT_FOUND);
+        }
+        TaskRequestLoadDTO t = tasksService.loadInitialTaskData(findCalendarById, findProjectById, parent_id, insert, labels, start, end);
 
         return ResponseEntity.ok(t);
     }
@@ -309,6 +391,10 @@ public class BaseController {
         if (project == null) {
             return new ResponseEntity("Project not found (project_id=" + dTO.getProject_id() + ")", HttpStatus.NOT_FOUND);
         }
+        CalendarEntity calendar = daoService.findById(dTO.getCalendar_id());
+        if (calendar == null) {
+            return new ResponseEntity("Calendar not found (calendar_id=" + dTO.getCalendar_id() + ")", HttpStatus.NOT_FOUND);
+        }
 
         if (dTO.getRepeatData() != null) {
             if (StringUtils.isBlank(dTO.getRepeatData().getMode())) {
@@ -319,7 +405,7 @@ public class BaseController {
             }
         }
 
-        tasksService.saveTaskData(dTO, project);
+        tasksService.saveTaskData(dTO, project, calendar);
 
         return ResponseEntity.ok(dTO);
     }
