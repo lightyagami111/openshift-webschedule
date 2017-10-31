@@ -137,8 +137,16 @@ $(document).ready(function () {
             'margin': '0 0 0 400px'
         });
     }
-
-
+    
+    $('#searchInput').val('');
+    $('#searchInput').keypress(function (e) {
+        if (e.which === 13) {
+            search();
+        }
+    });
+    $('#searchButton').on('click', function() {
+        search();
+    });
 
 });
 
@@ -148,7 +156,16 @@ $(document).ready(function () {
 
 
 
-
+function search() {
+    if ($('#searchInput').val().length !== 0) {
+        showTasksWrapper();
+        hideCalendarWrapper();
+        deselectProjectMenu();
+        selectedView = 'search';
+        selectedValue = $('#searchInput').val();        
+        refreshData();
+    }
+}
 
 
 

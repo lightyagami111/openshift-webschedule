@@ -21,6 +21,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.search.annotations.Field;
+import org.hibernate.search.annotations.Indexed;
 
 /**
  *
@@ -29,6 +31,7 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 @Entity
 @Cacheable
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Indexed
 public class TaskEntity implements Serializable {
     
     @Id
@@ -43,10 +46,12 @@ public class TaskEntity implements Serializable {
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private CalendarEntity calendar;
     
+    @Field
     private String text;
     private String parent;
     private String parent_text;
     
+    @Field
     @Column(columnDefinition="TEXT")
     private String notes;
     

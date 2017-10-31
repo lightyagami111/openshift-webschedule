@@ -38,9 +38,9 @@
                 <div class="navbar-header">                    
                     <div class="sidebar-search">
                         <div class="input-group custom-search-form">
-                            <input type="text" class="form-control" placeholder="Search...">
+                            <input type="text" class="form-control" placeholder="Search..." id="searchInput">
                             <span class="input-group-btn">
-                                <button class="btn btn-default" type="button">
+                                <button class="btn btn-default" type="button" id="searchButton">
                                     <i class="fa fa-search"></i>
                                 </button>
                             </span>

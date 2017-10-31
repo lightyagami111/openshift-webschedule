@@ -212,6 +212,20 @@ function loadTasksByLabel(label_id, callback) {
     });
 }
 
+function loadTasksBySearch(searchTerm, callback) {
+    jQuery.ajax({
+        type: "GET",
+        url: '/WebSchedule/loadTasksBySearch',
+        data: "searchTerm=" + encodeURIComponent(searchTerm),
+        success: function (result) {
+            callback(result);
+        },
+        error: function (xhr) {
+            errorMessage(xhr);
+        }
+    });
+}
+
 
 
 

@@ -19,6 +19,7 @@ import com.webschedule.design.datastructure.TaskRequestSaveDTO;
 import com.webschedule.design.datastructure.TaskTreeDTO;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -49,6 +50,18 @@ public class TasksService {
 
     @Autowired
     private GroupAndSortService groupAndSortService;
+    
+    public List<GroupSortDTO> searchAndGroup(String searchTerm) {
+        GroupSortEntity gs = groupAndSortService.getSearchGroupSort();
+        List<TaskEntity> tasksSearch = daoService.search(searchTerm);
+        
+        List<TaskTreeDTO> tasksdto = new ArrayList<>();
+        for (TaskEntity ts : tasksSearch) {
+            tasksdto.add(taskEntityToTree(ts, gs));
+        }
+        
+        return Arrays.asList(getGroupSortDTO(tasksdto, searchTerm, gs));
+    }
 
     public List<GroupSortDTO> groupAndSort(GroupSortEntity gs, List<TaskEntity> tasks) {
         List<GroupSortDTO> result = new ArrayList<>();

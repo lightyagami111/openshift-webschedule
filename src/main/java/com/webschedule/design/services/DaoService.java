@@ -18,7 +18,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.hibernate.Session;
+import org.hibernate.search.FullTextQuery;
+import org.hibernate.search.FullTextSession;
+import org.hibernate.search.Search;
+import org.hibernate.search.query.dsl.QueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.orm.hibernate4.HibernateTransactionManager;
 import org.springframework.stereotype.Component;
@@ -37,6 +43,35 @@ public class DaoService {
 
     private Session getCurrentSession() {
         return hibernateTransactionManager.getSessionFactory().getCurrentSession();
+    }
+
+    private FullTextSession getCurrentFullTextSession() {
+        return Search.getFullTextSession(getCurrentSession());
+    }
+
+    public int createIndex() {
+        getCurrentFullTextSession().purgeAll(TaskEntity.class);
+        try {
+            getCurrentFullTextSession().createIndexer().startAndWait();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(DaoService.class.getName()).log(Level.SEVERE, null, ex);
+            return 1;
+        }
+        return 0;
+    }
+
+    public List<TaskEntity> search(String searchTerm) {
+        QueryBuilder qb = getCurrentFullTextSession().getSearchFactory().buildQueryBuilder().forEntity(TaskEntity.class).get();
+        org.apache.lucene.search.Query luceneQuery = qb
+                .keyword().wildcard()
+                .onField("text")
+                .andField("notes")
+                .matching(searchTerm + "*")
+                .createQuery();
+
+        FullTextQuery fq = getCurrentFullTextSession().createFullTextQuery(luceneQuery, TaskEntity.class);
+
+        return fq.list();
     }
 
     public void persist(ProjectEntity p) {
@@ -69,7 +104,7 @@ public class DaoService {
             }
         }
         getCurrentSession().delete(p);
-        
+
         deleteGroupAndSort("projects", String.valueOf(id));
     }
 
@@ -93,33 +128,33 @@ public class DaoService {
         findProjectById.setDefaultProject(Boolean.TRUE);
         updateProject(findProjectById);
     }
-    
+
     //--------------------------------------------------------------------------
     // CALENDARS
     //--------------------------------------------------------------------------
     public void persist(CalendarEntity ce) {
         getCurrentSession().persist(ce);
     }
-    
+
     public void update(CalendarEntity ce) {
         getCurrentSession().merge(ce);
     }
-    
+
     public List<CalendarEntity> findAll() {
         return getCurrentSession().createQuery("SELECT ce FROM CalendarEntity ce").list();
     }
-    
+
     public List<CalendarEntity> findSelected() {
         return getCurrentSession().createQuery("SELECT ce FROM CalendarEntity ce WHERE ce.selected = true").list();
     }
-    
+
     public CalendarEntity findById(Long id) {
         return (CalendarEntity) getCurrentSession()
                 .createQuery("SELECT ce FROM CalendarEntity ce WHERE ce.id = :_id")
                 .setParameter("_id", id)
                 .uniqueResult();
     }
-    
+
     public void delete(Long id) {
         CalendarEntity findDefaultCalendar = findDefaultCalendar();
         getCurrentSession()
@@ -130,7 +165,7 @@ public class DaoService {
         CalendarEntity ce = findById(id);
         getCurrentSession().delete(ce);
     }
-    
+
     
     public CalendarEntity findDefaultCalendar() {
         CalendarEntity p = null;
@@ -153,7 +188,7 @@ public class DaoService {
         findCalendarById.setSelected(Boolean.TRUE);
         update(findCalendarById);
     }
-    
+
 
     //--------------------------------------------------------------------------
     // LABELS
@@ -179,10 +214,10 @@ public class DaoService {
         getCurrentSession().merge(p);
     }
 
-    public void deleteLabel(Long id) {        
-        LabelEntity p = findLabelById(id);        
+    public void deleteLabel(Long id) {
+        LabelEntity p = findLabelById(id);
         getCurrentSession().delete(p);
-        
+
         deleteGroupAndSort("labels", String.valueOf(id));
     }
 
@@ -217,7 +252,7 @@ public class DaoService {
     public List<TaskEntity> loadTasksByProject(Long project_id) {
         return getCurrentSession().createQuery("SELECT p FROM TaskEntity p WHERE p.project.id = :_id").setParameter("_id", project_id).list();
     }
-    
+
     public Long countTasksById(Long project_id) {
         return (Long) getCurrentSession().createQuery("SELECT COUNT(*) FROM TaskEntity p WHERE p.project.id = :_id").setParameter("_id", project_id).uniqueResult();
     }
@@ -342,7 +377,7 @@ public class DaoService {
                 .setParameterList("_findSelectedIds", findSelectedIds)
                 .list();
     }
-    
+
     
     //--------------------------------------------------------------------------
     // GROUP && SORT 
@@ -350,7 +385,7 @@ public class DaoService {
     public void saveOrUpdate(GroupSortEntity t) {
         getCurrentSession().saveOrUpdate(t);
     }
-    
+
     public GroupSortEntity findGSBySelectedViewAndId(String view, String id) {
         return (GroupSortEntity) getCurrentSession()
                 .createQuery("FROM GroupSortEntity gs WHERE gs.selectedView = :_selectedView AND gs.selectedId = :_selectedId")
@@ -358,12 +393,12 @@ public class DaoService {
                 .setParameter("_selectedId", id)
                 .uniqueResult();
     }
-    
+
     public void deleteGroupAndSort(String view, String id) {
         getCurrentSession().createQuery("DELETE FROM GroupSortEntity gs WHERE gs.selectedView = :_selectedView AND gs.selectedId = :_selectedId")
                 .setParameter("_selectedView", view)
                 .setParameter("_selectedId", id)
                 .executeUpdate();
     }
-    
+
 }

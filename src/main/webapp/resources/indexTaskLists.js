@@ -5,7 +5,7 @@ var task_list_template = $('#tasks_list_template').html();
 function refreshTasksListsCallback(result) {
     $('#tasks_list_content').html('');
     var groups = result.groups;
-    var view = result.e.text;
+    var view = result.view;
     var allowNewTaskAction = result.allowNewTaskAction;
     for (var i = 0; i < groups.length; i++) {
         var d1 = groups[i];

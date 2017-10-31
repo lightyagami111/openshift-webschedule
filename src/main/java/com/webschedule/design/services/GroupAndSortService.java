@@ -47,7 +47,21 @@ public class GroupAndSortService {
         return selectedGS;
     }
     
-    
+    public GroupSortEntity getSearchGroupSort() {
+        String view = "search";
+        String id = "search-0";
+        GroupSortEntity selectedGS = daoService.findGSBySelectedViewAndId(view, id);
+        if (selectedGS == null) {
+            selectedGS = new GroupSortEntity();
+            selectedGS.setSelectedView(view);
+            selectedGS.setSelectedId(id);
+            selectedGS.setGroup_("");
+            selectedGS.setSort_("");
+            daoService.saveOrUpdate(selectedGS);
+        }
+        return selectedGS;
+    }
+        
     public boolean allowNewTaskAction(GroupSortEntity gs) {
         return gs.getGroup_().equals("dont-group") && gs.getSort_().equals("dont-sort");
     }

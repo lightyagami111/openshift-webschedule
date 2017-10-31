@@ -4,8 +4,7 @@ import com.webschedule.design.datastructure.CalendarEntity;
 import com.webschedule.design.datastructure.CalendarUIEventDTO;
 import com.webschedule.design.datastructure.GroupSortDTO;
 import com.webschedule.design.datastructure.GroupSortEntity;
-import com.webschedule.design.datastructure.GroupSortFromLabelDTO;
-import com.webschedule.design.datastructure.GroupSortFromProjectDTO;
+import com.webschedule.design.datastructure.GroupSortResponseDTO;
 import com.webschedule.design.datastructure.LabelEntity;
 import com.webschedule.design.datastructure.ProjectEntity;
 import com.webschedule.design.datastructure.TaskEntity;
@@ -302,14 +301,14 @@ public class BaseController {
     //--------------------------------------------------------------------------
     @RequestMapping(value = {"/loadTasksByProject/group"}, method = RequestMethod.GET)
     public @ResponseBody
-    GroupSortFromProjectDTO loadTasksByProjectGroup(@RequestParam(value = "id") Long id) {
+    GroupSortResponseDTO loadTasksByProjectGroup(@RequestParam(value = "id") Long id) {
         ProjectEntity pe = daoService.findProjectById(id);
         GroupSortEntity gs = groupAndSortService.getExistingOrDefault("projects", String.valueOf(id));
         List<TaskEntity> tasks = daoService.loadTasksByProject(id);
         List<GroupSortDTO> groups = tasksService.groupAndSort(gs, tasks);
 
-        GroupSortFromProjectDTO result = new GroupSortFromProjectDTO();
-        result.setE(pe);
+        GroupSortResponseDTO result = new GroupSortResponseDTO();
+        result.setView(pe.getText());
         result.setGroups(groups);
         result.setAllowNewTaskAction(groupAndSortService.allowNewTaskAction(gs));
 
@@ -324,14 +323,14 @@ public class BaseController {
 
     @RequestMapping(value = {"/loadTasksByLabel"}, method = RequestMethod.GET)
     public @ResponseBody
-    GroupSortFromLabelDTO loadTasksByLabel(@RequestParam(value = "id") Long id) {
+    GroupSortResponseDTO loadTasksByLabel(@RequestParam(value = "id") Long id) {
         LabelEntity le = daoService.findLabelById(id);
         GroupSortEntity gs = groupAndSortService.getExistingOrDefault("labels", String.valueOf(id));
         List<TaskEntity> tasks = daoService.loadTaskByLabel(id);
         List<GroupSortDTO> groups = tasksService.groupAndSort(gs, tasks);
 
-        GroupSortFromLabelDTO result = new GroupSortFromLabelDTO();
-        result.setE(le);
+        GroupSortResponseDTO result = new GroupSortResponseDTO();
+        result.setView(le.getText());
         result.setGroups(groups);
         result.setAllowNewTaskAction(groupAndSortService.allowNewTaskAction(gs));
 
@@ -539,5 +538,22 @@ public class BaseController {
     ResponseEntity getGS(@RequestParam(value = "selectedView") String view, @RequestParam(value = "selectedId") String id) {
         return ResponseEntity.ok(groupAndSortService.getExistingOrDefault(view, id));
     }
-
+    
+    
+    
+    @RequestMapping(value = {"/createIndex"}, method = RequestMethod.GET)
+    public @ResponseBody ResponseEntity createIndex() {
+        int r = daoService.createIndex();
+        return ResponseEntity.ok(r);
+    }
+    
+    @RequestMapping(value = {"/loadTasksBySearch"}, method = RequestMethod.GET)
+    public @ResponseBody GroupSortResponseDTO loadTasksBySearch(@RequestParam(value = "searchTerm") String searchTerm) {
+        GroupSortResponseDTO gsDTO = new GroupSortResponseDTO();
+        gsDTO.setView("SEARCH");
+        gsDTO.setGroups(tasksService.searchAndGroup(searchTerm));
+        gsDTO.setAllowNewTaskAction(groupAndSortService.allowNewTaskAction(groupAndSortService.getSearchGroupSort()));
+        
+        return gsDTO;
+    }
 }
