@@ -398,6 +398,7 @@ public class TasksService {
 
         TaskRequestLoadDTO result = new TaskRequestLoadDTO();
         Copier.copy(t, result);
+        result.setRepeatData(loadTaskRepeatData(null));
 
         return result;
     }
