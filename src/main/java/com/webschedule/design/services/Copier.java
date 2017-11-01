@@ -10,12 +10,15 @@ import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author ivaylo
  */
 public final class Copier {
+    
+    static Logger log = Logger.getLogger(Copier.class.getName());
 
     public static void copy(final Object from, final Object to) {
         Map<String, Field> fromFields = analyze(from);
@@ -32,6 +35,7 @@ public final class Copier {
                 try {
                     targetField.set(to, sourceField.get(from));
                 } catch (IllegalAccessException e) {
+                    log.error("Can't access field!", e);
                     throw new IllegalStateException("Can't access field!");
                 }
             }

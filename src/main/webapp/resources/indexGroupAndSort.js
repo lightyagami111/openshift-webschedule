@@ -48,7 +48,10 @@ function setGroupAndSort() {
         disableItem();
     });
 }
-function saveGroupAndSort(group_, sort_) {        
+function saveGroupAndSort(group_, sort_) {     
+    if (selectedView === 'search') {
+        return false;
+    }
     saveOrUpdateGS({
         view: selectedView,
         id: selectedValue,

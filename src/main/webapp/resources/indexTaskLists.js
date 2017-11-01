@@ -118,7 +118,7 @@ function showMoreInfo(data_tasks, element) {
                 if (haveAppendedText === true) {
                     append = '&nbsp;&nbsp;|| ';
                 }
-                m.append(append + 'prio ' + task.priority);
+                m.append(append + '<i class="fa fa-diamond" aria-hidden="true"></i> ' + task.priority);
                 haveAppendedText = true;
             }
 
@@ -127,7 +127,7 @@ function showMoreInfo(data_tasks, element) {
             if (task.labels !== null) {
                 var labels_text = '';
                 for (var i = 0; i < task.labels.length; i++) {
-                    labels_text = labels_text + task.labels[i].text + ', ';
+                    labels_text = labels_text + ' <i class="fa fa-tag" aria-hidden="true"></i>' + task.labels[i].text;
                 }
 
                 if (labels_text.length > 0) {
@@ -135,7 +135,7 @@ function showMoreInfo(data_tasks, element) {
                     if (haveAppendedText === true) {
                         append = '&nbsp;&nbsp;|| ';
                     }
-                    m.append(append + 'labels ' + labels_text);
+                    m.append(append + labels_text);
                 }
             }
 
@@ -146,13 +146,13 @@ function showMoreInfo(data_tasks, element) {
     }
 }
 
-function showMoreInfoDate(data, el) {
-    var momentFormat = 'dd DD MMM YYYY';
-    if (data.allDay === false) {
-        momentFormat = 'dd DD MMM YYYY h:mm a';
-    }
+function showMoreInfoDate(data, el) {        
     if (data.start !== null) {
         var moment_start = moment(data.start).local();
+        var momentFormat = 'dd DD MMM YYYY';
+        if (data.allDay === false) {
+            momentFormat = 'dd DD MMM YYYY h:mm a';
+        }
         el.append(moment_start.format(momentFormat));
         if (moment_start.isBefore(moment().local(), 'day')) {
             el.css({
@@ -167,8 +167,12 @@ function showMoreInfoDate(data, el) {
     }
     if (data.end !== null) {
         var moment_start = moment(data.start).local();
-        var moment_end = moment(data.end).local();
-        el.append(' - ' + moment(data.end).local().format('h:mm a'));
+        var moment_end = moment(data.end).local();    
+        var momentFormat = 'dd DD MMM YYYY';
+        if (data.allDay === false) {
+            momentFormat = 'h:mm a';
+        }
+        el.append(' - ' + moment(data.end).local().format(momentFormat));
         if ((moment_start.isBefore(moment().local(), 'day') || moment_start.isSame(moment().local(), 'day'))
                 &&
                 (moment_end.isAfter(moment().local(), 'day') || moment_end.isSame(moment().local(), 'day'))) {

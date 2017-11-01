@@ -18,8 +18,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.hibernate.Session;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
@@ -37,6 +35,8 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @Component
 public class DaoService {
+    
+    static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DaoService.class.getName());
 
     @Autowired
     private HibernateTransactionManager hibernateTransactionManager;
@@ -54,7 +54,7 @@ public class DaoService {
         try {
             getCurrentFullTextSession().createIndexer().startAndWait();
         } catch (InterruptedException ex) {
-            Logger.getLogger(DaoService.class.getName()).log(Level.SEVERE, null, ex);
+            log.error(ex.getMessage(), ex);
             return 1;
         }
         return 0;
@@ -140,29 +140,29 @@ public class DaoService {
         getCurrentSession().merge(ce);
     }
 
-    public List<CalendarEntity> findAll() {
+    public List<CalendarEntity> findAllCalendars() {
         return getCurrentSession().createQuery("SELECT ce FROM CalendarEntity ce").list();
     }
 
-    public List<CalendarEntity> findSelected() {
+    public List<CalendarEntity> findSelectedCalendars() {
         return getCurrentSession().createQuery("SELECT ce FROM CalendarEntity ce WHERE ce.selected = true").list();
     }
 
-    public CalendarEntity findById(Long id) {
+    public CalendarEntity findCalendarById(Long id) {
         return (CalendarEntity) getCurrentSession()
                 .createQuery("SELECT ce FROM CalendarEntity ce WHERE ce.id = :_id")
                 .setParameter("_id", id)
                 .uniqueResult();
     }
 
-    public void delete(Long id) {
+    public void deleteCalendar(Long id) {
         CalendarEntity findDefaultCalendar = findDefaultCalendar();
         getCurrentSession()
                 .createQuery("UPDATE TaskEntity t SET t.calendar = :_cal WHERE t.calendar.id = :_id")
                 .setParameter("_id", id)
                 .setParameter("_cal", findDefaultCalendar)
                 .executeUpdate();
-        CalendarEntity ce = findById(id);
+        CalendarEntity ce = findCalendarById(id);
         getCurrentSession().delete(ce);
     }
 
@@ -177,13 +177,13 @@ public class DaoService {
     }
 
     public void setDefaultCalendar(Long id) {
-        List<CalendarEntity> findAllCalendars = findAll();
+        List<CalendarEntity> findAllCalendars = findAllCalendars();
         for (CalendarEntity findAllCalendar : findAllCalendars) {
             findAllCalendar.setDefaultCalendar(Boolean.FALSE);
             update(findAllCalendar);
         }
 
-        CalendarEntity findCalendarById = findById(id);
+        CalendarEntity findCalendarById = findCalendarById(id);
         findCalendarById.setDefaultCalendar(Boolean.TRUE);
         findCalendarById.setSelected(Boolean.TRUE);
         update(findCalendarById);
@@ -302,7 +302,7 @@ public class DaoService {
     }
 
     public List<TaskRepeatDataEntity> findRepeatableTasks() {
-        List<CalendarEntity> findSelected = findSelected();
+        List<CalendarEntity> findSelected = findSelectedCalendars();
         List<Long> findSelectedIds = Lambda.extract(findSelected, Lambda.on(CalendarEntity.class).getId());
         findSelectedIds.add(Long.MIN_VALUE);
         return getCurrentSession()
@@ -369,7 +369,7 @@ public class DaoService {
     // EVENTS
     //--------------------------------------------------------------------------
     public List<TaskEntity> findTasksBetween(Date start, Date end) {
-        List<CalendarEntity> findSelected = findSelected();
+        List<CalendarEntity> findSelected = findSelectedCalendars();
         List<Long> findSelectedIds = Lambda.extract(findSelected, Lambda.on(CalendarEntity.class).getId());
         findSelectedIds.add(Long.MIN_VALUE);
         return getCurrentSession()

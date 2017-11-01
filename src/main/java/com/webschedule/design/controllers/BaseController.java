@@ -8,6 +8,7 @@ import com.webschedule.design.datastructure.GroupSortResponseDTO;
 import com.webschedule.design.datastructure.LabelEntity;
 import com.webschedule.design.datastructure.ProjectEntity;
 import com.webschedule.design.datastructure.TaskEntity;
+import com.webschedule.design.datastructure.TaskRepeatDataDTO;
 import com.webschedule.design.datastructure.TaskRequestLoadDTO;
 import com.webschedule.design.datastructure.TaskRequestSaveDTO;
 import com.webschedule.design.services.DaoService;
@@ -15,13 +16,13 @@ import com.webschedule.design.services.GroupAndSortService;
 import com.webschedule.design.services.TasksService;
 import com.webschedule.design.services.Utils;
 import java.io.IOException;
-import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import net.sf.ehcache.Cache;
 import net.sf.ehcache.CacheManager;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,9 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Controller
 public class BaseController {
+    
+    static Logger log = Logger.getLogger(BaseController.class.getName());
+    
 
     @Autowired
     private DaoService daoService;
@@ -76,9 +80,7 @@ public class BaseController {
         long totalHeapPutCount = 0l;
         long totalHeapPutUpdatedCount = 0l;
         long totalHeapRemoveCount = 0l;
-        
-        
-        
+
         /* get stats for all known caches */
         for (String name : cacheManager.getCacheNames()) {
             Cache cache = cacheManager.getCache(name);
@@ -104,7 +106,7 @@ public class BaseController {
             totalHeapPutCount = totalHeapPutCount + cache.getStatistics().localHeapPutCount();
             totalHeapPutUpdatedCount = totalHeapPutUpdatedCount + cache.getStatistics().localHeapPutUpdatedCount();
             totalHeapRemoveCount = totalHeapRemoveCount + cache.getStatistics().localHeapRemoveCount();
-            
+
             sb.append(name)
                     .append("\n cacheEvictedCount = " + cache.getStatistics().cacheEvictedCount())
                     .append("\n cacheExpiredCount = " + cache.getStatistics().cacheExpiredCount())
@@ -130,34 +132,32 @@ public class BaseController {
                     .append("\n localHeapRemoveCount = " + cache.getStatistics().localHeapRemoveCount())
                     .append("\n\n");
         }
-        
-        
+
         sb1.append("TOTAL : ")
                 .append("\n cacheEvictedCount = " + totalEvictedCount)
-                    .append("\n cacheExpiredCount = " + totalExpiredCount)
-                    .append("\n cacheHitCount = " + totalHitCount)
-                    .append("\n cacheMissCount = " + totalMissCount)
-                    .append("\n cacheMissExpiredCount = " + totalMissExpiredCount)
-                    .append("\n cacheMissNotFoundCount = " + totalMissNotFoundCount)
-                    .append("\n cachePutAddedCount = " + totalPutAddedCount)
-                    .append("\n cachePutCount = " + totalPutCount)
-                    .append("\n cachePutUpdatedCount = " + totalPutUpdatedCount)
-                    .append("\n cacheRemoveCount = " + totalRemoveCount)
-                    .append("\n getLocalHeapSize = " + totalLocalHeapSize)
-                    .append("\n getLocalHeapSizeInBytes = " + totalLocalHeapSizeInBytes)
-                    .append("\n getLocalOffHeapSize = " + totalLocalOffHeapSize)
-                    .append("\n getLocalOffHeapSizeInBytes = " + totalLocalOffHeapSizeInBytes)
-                    .append("\n getRemoteSize = " + totalRemoteSize)
-                    .append("\n getSize = " + totalSize)
-                    .append("\n localHeapHitCount = " + totalHeapHitCount)
-                    .append("\n localHeapMissCount = " + totalHeapMissCount)
-                    .append("\n localHeapPutAddedCount = " + totalHeapPutAddedCount)
-                    .append("\n localHeapPutCount = " + totalHeapPutCount)
-                    .append("\n localHeapPutUpdatedCount = " + totalHeapPutUpdatedCount)
-                    .append("\n localHeapRemoveCount = " + totalHeapRemoveCount)
-                    .append("\n\n");
-        
-        
+                .append("\n cacheExpiredCount = " + totalExpiredCount)
+                .append("\n cacheHitCount = " + totalHitCount)
+                .append("\n cacheMissCount = " + totalMissCount)
+                .append("\n cacheMissExpiredCount = " + totalMissExpiredCount)
+                .append("\n cacheMissNotFoundCount = " + totalMissNotFoundCount)
+                .append("\n cachePutAddedCount = " + totalPutAddedCount)
+                .append("\n cachePutCount = " + totalPutCount)
+                .append("\n cachePutUpdatedCount = " + totalPutUpdatedCount)
+                .append("\n cacheRemoveCount = " + totalRemoveCount)
+                .append("\n getLocalHeapSize = " + totalLocalHeapSize)
+                .append("\n getLocalHeapSizeInBytes = " + totalLocalHeapSizeInBytes)
+                .append("\n getLocalOffHeapSize = " + totalLocalOffHeapSize)
+                .append("\n getLocalOffHeapSizeInBytes = " + totalLocalOffHeapSizeInBytes)
+                .append("\n getRemoteSize = " + totalRemoteSize)
+                .append("\n getSize = " + totalSize)
+                .append("\n localHeapHitCount = " + totalHeapHitCount)
+                .append("\n localHeapMissCount = " + totalHeapMissCount)
+                .append("\n localHeapPutAddedCount = " + totalHeapPutAddedCount)
+                .append("\n localHeapPutCount = " + totalHeapPutCount)
+                .append("\n localHeapPutUpdatedCount = " + totalHeapPutUpdatedCount)
+                .append("\n localHeapRemoveCount = " + totalHeapRemoveCount)
+                .append("\n\n");
+
         return sb1.append(sb).toString();
 
     }
@@ -223,21 +223,20 @@ public class BaseController {
 
         return new ResponseEntity(HttpStatus.OK);
     }
-    
-    
+
     //--------------------------------------------------------------------------
     // CALENDARS
     //--------------------------------------------------------------------------
     @RequestMapping(value = {"/loadCalendars"}, method = RequestMethod.GET)
     public @ResponseBody
     List<CalendarEntity> loadCalendars() {
-        return daoService.findAll();
+        return daoService.findAllCalendars();
     }
-    
+
     @RequestMapping(value = {"/getCalendarByid"}, method = RequestMethod.GET)
     public @ResponseBody
     CalendarEntity getCalendarByid(@RequestParam(value = "id") Long id) {
-        return daoService.findById(id);
+        return daoService.findCalendarById(id);
     }
 
     @RequestMapping(value = {"/addNewCalendar"}, method = RequestMethod.POST)
@@ -256,14 +255,14 @@ public class BaseController {
 
     @RequestMapping(value = {"/deleteCalendar"}, method = RequestMethod.DELETE)
     public ResponseEntity deleteCalendar(@RequestParam(value = "id") Long id) {
-        CalendarEntity findById = daoService.findById(id);
+        CalendarEntity findById = daoService.findCalendarById(id);
         if (findById.getDefaultCalendar()) {
             return new ResponseEntity(">> default calendar can't be deleted!", HttpStatus.CONFLICT);
         }
-        daoService.delete(id);
+        daoService.deleteCalendar(id);
         return new ResponseEntity(HttpStatus.OK);
     }
-    
+
     @RequestMapping(value = {"/getDefaultCalendar"}, method = RequestMethod.GET)
     public @ResponseBody
     Map getDefaultCalendar() {
@@ -280,16 +279,15 @@ public class BaseController {
     public void setDefaultCalendar(@RequestParam(value = "id") Long id) {
         daoService.setDefaultCalendar(id);
     }
-    
+
     @ResponseStatus(HttpStatus.OK)
     @RequestMapping(value = {"/setSelectedCalendar"}, method = RequestMethod.PUT)
     public void setSelectedCalendars(@RequestParam(value = "ids") List<Long> ids) {
-        List<CalendarEntity> findAll = daoService.findAll();
+        List<CalendarEntity> findAll = daoService.findAllCalendars();
         for (CalendarEntity ce : findAll) {
             if (ids.contains(ce.getId())) {
                 ce.setSelected(Boolean.TRUE);
-            }
-            else {
+            } else {
                 ce.setSelected(Boolean.FALSE);
             }
             daoService.update(ce);
@@ -366,7 +364,7 @@ public class BaseController {
         if (findProjectById == null) {
             return new ResponseEntity("Project not found (project_id=" + project_id + ")", HttpStatus.NOT_FOUND);
         }
-        CalendarEntity findCalendarById = daoService.findById(calendar_id);
+        CalendarEntity findCalendarById = daoService.findCalendarById(calendar_id);
         if (findCalendarById == null) {
             return new ResponseEntity("Calendar not found (calendar_id=" + calendar_id + ")", HttpStatus.NOT_FOUND);
         }
@@ -377,30 +375,54 @@ public class BaseController {
 
     @RequestMapping(value = {"/saveTaskData"}, method = RequestMethod.POST)
     public @ResponseBody
-    ResponseEntity saveTaskData(@RequestBody TaskRequestSaveDTO dTO) throws ParseException {
-        if (dTO.getAllDay() != null) {
-            if (dTO.getAllDay() == false) {
-                if (StringUtils.isBlank(dTO.getStart())) {
-                    return new ResponseEntity(">> allDay is false ; start date/time is null", HttpStatus.BAD_REQUEST);
-                }
-            }
-        }
+    ResponseEntity saveTaskData(@RequestBody TaskRequestSaveDTO dTO) {
 
         ProjectEntity project = daoService.findProjectById(dTO.getProject_id());
         if (project == null) {
             return new ResponseEntity("Project not found (project_id=" + dTO.getProject_id() + ")", HttpStatus.NOT_FOUND);
         }
-        CalendarEntity calendar = daoService.findById(dTO.getCalendar_id());
+        CalendarEntity calendar = daoService.findCalendarById(dTO.getCalendar_id());
         if (calendar == null) {
             return new ResponseEntity("Calendar not found (calendar_id=" + dTO.getCalendar_id() + ")", HttpStatus.NOT_FOUND);
         }
 
         if (dTO.getRepeatData() != null) {
-            if (StringUtils.isBlank(dTO.getRepeatData().getMode())) {
+            TaskRepeatDataDTO repeatData = dTO.getRepeatData();
+            if (StringUtils.isBlank(repeatData.getMode())) {
                 return new ResponseEntity("'mode' is null", HttpStatus.BAD_REQUEST);
             }
-            if (dTO.getRepeatData().getMode_start() == null) {
-                return new ResponseEntity("'starting on' is null", HttpStatus.BAD_REQUEST);
+            if (repeatData.getMode_start() == null) {
+                return new ResponseEntity("'mode_start' is null", HttpStatus.BAD_REQUEST);
+            }
+            if (repeatData.getEndson_until() != null) {
+                if (repeatData.getMode_start().after(repeatData.getEndson_until())) {
+                    return new ResponseEntity("'mode_start' is after 'endson_until'", HttpStatus.BAD_REQUEST);
+                }
+            }
+            if (repeatData.getMode_end() != null) {
+                if (repeatData.getMode_start().after(repeatData.getMode_end())) {
+                    return new ResponseEntity("'mode_start' is after 'mode_end'", HttpStatus.BAD_REQUEST);
+                }
+            }
+        } else {
+            if (dTO.getAllDay() != null) {
+                if (dTO.getAllDay() == false) {
+                    if (StringUtils.isBlank(dTO.getStart())) {
+                        return new ResponseEntity("allDay is false ; start date/time is null", HttpStatus.BAD_REQUEST);
+                    }
+                }
+            }
+            if (StringUtils.isNotBlank(dTO.getEnd())) {
+                if (StringUtils.isBlank(dTO.getStart())) {
+                    return new ResponseEntity("please specify start date", HttpStatus.BAD_REQUEST);
+                }
+                else {
+                    Date st = Utils.parse(dTO.getStart());
+                    Date en = Utils.parse(dTO.getEnd());
+                    if (st.after(en)) {
+                        return new ResponseEntity("'start' is after 'end'", HttpStatus.BAD_REQUEST);
+                    }
+                }
             }
         }
 
@@ -510,11 +532,18 @@ public class BaseController {
     //--------------------------------------------------------------------------
     @RequestMapping(value = "/link/title", method = RequestMethod.POST)
     public @ResponseBody
-    Map getTitleFromUrlLink(@RequestBody Map<String, Object> body) throws IOException {
+    Map getTitleFromUrlLink(@RequestBody Map<String, Object> body) {
         String url = body.get("url").toString();
 
-        Document doc = Jsoup.connect(url).get();
-        String title = doc.title();
+        Document doc;
+        String title;
+        try {
+            doc = Jsoup.connect(url).get();
+            title = doc.title();
+        } catch (IOException ex) {
+            log.error(ex.getMessage(), ex);
+            title = url;
+        }
 
         return Utils.mapOf("title", title);
     }
@@ -538,22 +567,22 @@ public class BaseController {
     ResponseEntity getGS(@RequestParam(value = "selectedView") String view, @RequestParam(value = "selectedId") String id) {
         return ResponseEntity.ok(groupAndSortService.getExistingOrDefault(view, id));
     }
-    
-    
-    
+
     @RequestMapping(value = {"/createIndex"}, method = RequestMethod.GET)
-    public @ResponseBody ResponseEntity createIndex() {
+    public @ResponseBody
+    ResponseEntity createIndex() {
         int r = daoService.createIndex();
         return ResponseEntity.ok(r);
     }
-    
+
     @RequestMapping(value = {"/loadTasksBySearch"}, method = RequestMethod.GET)
-    public @ResponseBody GroupSortResponseDTO loadTasksBySearch(@RequestParam(value = "searchTerm") String searchTerm) {
+    public @ResponseBody
+    GroupSortResponseDTO loadTasksBySearch(@RequestParam(value = "searchTerm") String searchTerm) {
         GroupSortResponseDTO gsDTO = new GroupSortResponseDTO();
         gsDTO.setView("SEARCH");
         gsDTO.setGroups(tasksService.searchAndGroup(searchTerm));
         gsDTO.setAllowNewTaskAction(groupAndSortService.allowNewTaskAction(groupAndSortService.getSearchGroupSort()));
-        
+
         return gsDTO;
     }
 }

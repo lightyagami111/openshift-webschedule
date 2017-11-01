@@ -15,12 +15,15 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.log4j.Logger;
 
 /**
  *
  * @author asd
  */
 public class Utils {
+    
+    static Logger log = Logger.getLogger(Utils.class.getName());
 
     public static Map mapOf(Object... objects) {
         Map m = new HashMap();
@@ -32,7 +35,7 @@ public class Utils {
         return m;
     }
 
-    public static Date parse(String date) throws ParseException {
+    public static Date parse(String date) {
         Date res = null;
 
         if (StringUtils.isNotBlank(date)) {
@@ -46,7 +49,11 @@ public class Utils {
             } catch (ParseException ex) {
                 SimpleDateFormat isoDateFormat = new SimpleDateFormat("yyyy-MM-dd");
                 isoDateFormat.setTimeZone(aDefault);
-                res = isoDateFormat.parse(date);
+                try {
+                    res = isoDateFormat.parse(date);
+                } catch (ParseException ex2) {
+                    log.error("", ex);
+                }
             }
 
         }
@@ -57,7 +64,7 @@ public class Utils {
     public static String format(Date date) {
         return format(date, "yyyy-MM-dd'T'HH:mm:ss");
     }
-    
+
     public static String format(Date date, String format) {
         String res = null;
 
@@ -72,16 +79,30 @@ public class Utils {
         return res;
     }
 
+    public static boolean equalsDates(Date d1, Date d2) {
+        int result = 0;
+        if (d1 == null) {
+            if (d2 != null) {
+                result = -1;
+            }
+        } else if (d2 == null) {
+            result = 1;
+        } else {
+            result = d1.compareTo(d2);
+        }
+        return result==0;
+    }
+
     public static boolean checkForChangesToDeleteEventExceptions(TaskRepeatDataEntity te, TaskRepeatDataDTO dTO) {
         boolean res = false;
 
         if (!Objects.equals(te.getMode(), dTO.getMode())) {
             res = true;
         }
-        if (te.getMode_start() != dTO.getMode_start()) {
+        if (!equalsDates(te.getMode_start(),dTO.getMode_start())) {
             res = true;
         }
-        if (te.getMode_end() != dTO.getMode_end()) {
+        if (!equalsDates(te.getMode_end(), dTO.getMode_end())) {
             res = true;
         }
         if (!Objects.equals(te.getAllDay(), dTO.getAllDay())) {
@@ -94,7 +115,7 @@ public class Utils {
         if (!Objects.equals(te.getEndson_count(), dTO.getEndson_count())) {
             res = true;
         }
-        if (te.getEndson_until() != dTO.getEndson_until()) {
+        if (!equalsDates(te.getEndson_until(), dTO.getEndson_until())) {
             res = true;
         }
 
@@ -117,6 +138,6 @@ public class Utils {
         }
 
         return res;
-    }   
+    }
 
 }

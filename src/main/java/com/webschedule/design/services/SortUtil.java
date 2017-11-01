@@ -9,13 +9,10 @@ import ch.lambdaj.Lambda;
 import com.webschedule.design.datastructure.GroupSortDTO;
 import com.webschedule.design.datastructure.GroupSortEntity;
 import com.webschedule.design.datastructure.TaskTreeDTO;
-import java.text.ParseException;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.hamcrest.Matchers;
 
 /**
@@ -135,14 +132,8 @@ class Comparators {
     public static Comparator<GroupSortDTO> DATE_GROUP_UP = new Comparator<GroupSortDTO>() {
         @Override
         public int compare(GroupSortDTO o1, GroupSortDTO o2) {
-            Date d1 = null;
-            Date d2 = null;
-            try {
-                d1 = Utils.parse(o1.getGroupBy());
-                d2 = Utils.parse(o2.getGroupBy());
-            } catch (ParseException ex) {
-                Logger.getLogger(Comparators.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            Date d1 = Utils.parse(o1.getGroupBy());
+            Date d2 = Utils.parse(o2.getGroupBy());
 
             int result = 0;
             if (d1 == null) {
@@ -161,14 +152,8 @@ class Comparators {
     public static Comparator<GroupSortDTO> DATE_GROUP_DOWN = new Comparator<GroupSortDTO>() {
         @Override
         public int compare(GroupSortDTO o1, GroupSortDTO o2) {
-            Date d1 = null;
-            Date d2 = null;
-            try {
-                d1 = Utils.parse(o1.getGroupBy());
-                d2 = Utils.parse(o2.getGroupBy());
-            } catch (ParseException ex) {
-                Logger.getLogger(Comparators.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            Date d1 = Utils.parse(o1.getGroupBy());
+            Date d2 = Utils.parse(o2.getGroupBy());
 
             int result = 0;
             if (d1 == null) {

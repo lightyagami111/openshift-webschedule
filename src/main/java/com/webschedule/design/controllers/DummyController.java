@@ -14,7 +14,6 @@ import com.webschedule.design.datastructure.TaskRepeatDataEntity;
 import com.webschedule.design.services.DaoService;
 import com.webschedule.design.services.RepeatableService;
 import com.webschedule.design.services.Utils;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -135,7 +134,7 @@ public class DummyController {
 
     @RequestMapping(value = "/update/rep/exceptions", method = RequestMethod.GET)
     public @ResponseBody
-    String updateTasksTimeRepExceptions(@RequestParam Long project_id) throws ParseException {
+    String updateTasksTimeRepExceptions(@RequestParam Long project_id) {
         List<TaskEntity> tasks = daoService.loadTasksByProject(project_id);
         for (TaskEntity task : tasks) {
             TaskRepeatDataEntity rep = daoService.findRepeatDataByTaskId(task.getId());

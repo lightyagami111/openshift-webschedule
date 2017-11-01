@@ -6,10 +6,7 @@
 package com.webschedule.design.datastructure;
 
 import com.webschedule.design.services.Utils;
-import java.text.ParseException;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.validation.constraints.NotNull;
 
 /**
@@ -58,12 +55,7 @@ public class TaskRepeatDataDTO {
     }
 
     public Date getMode_start() {
-        try {
-            return Utils.parse(mode_start);
-        } catch (ParseException ex) {
-            Logger.getLogger(TaskRepeatDataDTO.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
+        return Utils.parse(mode_start);
     }
 
     public void setMode_start(String mode_start) {
@@ -79,12 +71,7 @@ public class TaskRepeatDataDTO {
     }
 
     public Date getEndson_until() {
-        try {
-            return Utils.parse(endson_until);
-        } catch (ParseException ex) {
-            Logger.getLogger(TaskRepeatDataDTO.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
+        return Utils.parse(endson_until);
     }
 
     public void setEndson_until(String endson_until) {
@@ -148,12 +135,7 @@ public class TaskRepeatDataDTO {
     }
 
     public Date getMode_end() {
-        try {
-            return Utils.parse(mode_end);
-        } catch (ParseException ex) {
-            Logger.getLogger(TaskRepeatDataDTO.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return null;
+        return Utils.parse(mode_end);
     }
 
     public void setMode_end(String mode_end) {

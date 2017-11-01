@@ -332,6 +332,7 @@ function loadSchDataAjaxCallback(form, taskData, fromRepeatTaskId, fromRepeatTas
     $('.repeatTask_Modal_Button').on('click', function () {
         loadRepeatSchDataAjaxCallback(taskData.repeatData);
     });    
+    loadRepeatSchDataAjaxCallback(taskData.repeatData);
     
     $('#repeatTask_Modal_done').unbind('click');
     $('#repeatTask_Modal_done').on('click', function (event) {
@@ -459,13 +460,13 @@ function saveSchData(form) {
     }
     taskData.text = title;
 
+    taskData.allDay = $('input[name="allDay"]').prop('checked');
     
     var do_repeat = $('#repeatTrue').prop('checked');
     if (do_repeat === true) {
         taskData.repeatData = getRepeatSchData();
     }
-    else {
-        taskData.allDay = $('input[name="allDay"]').prop('checked');
+    else {        
         if (taskData.allDay === true) {
             setTimeToPicker('start', null);
             setTimeToPicker('end', null);

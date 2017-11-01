@@ -10,7 +10,6 @@ import com.webschedule.design.datastructure.CalendarUIEventDTO;
 import com.webschedule.design.datastructure.EventException;
 import com.webschedule.design.datastructure.TaskEntity;
 import com.webschedule.design.datastructure.TaskRepeatDataEntity;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -18,8 +17,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.springframework.stereotype.Service;
 
 /**
@@ -111,11 +108,7 @@ public class RepeatableService {
         if (rep.getEndson().equals("on_date")) {
             res = afterOrEqual(rep.getEndson_until(), now);
         } else if (rep.getEndson().equals("never")) {
-            try {
-                res = afterOrEqual(Utils.parse("3333-12-31"), now);
-            } catch (ParseException ex) {
-                Logger.getLogger(RepeatableService.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            res = afterOrEqual(Utils.parse("3333-12-31"), now);
         } else { //count
             res = count < rep.getEndson_count();
         }
