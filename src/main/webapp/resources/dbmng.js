@@ -8,6 +8,9 @@ $(document).ready(function () {
 });
 
 function errorMessage(xhr) {
+    if (xhr.responseText.indexOf("action='/WebSchedule/login'")) {
+        window.location.href = '/WebSchedule/login';
+    }
     $('#error_Modal').find('.modal-title').text('status = ' + xhr.status + '; status text = ' + xhr.statusText);
     $('#error_Modal').find('.modal-body').html(xhr.responseText);
     $('#error_Modal_Button').click();
@@ -19,6 +22,7 @@ function getTitleFromUrlLink(body, callback) {
         url: '/WebSchedule/link/title' + _csrf,
         data: JSON.stringify(body),
         contentType: 'application/json; charset=UTF-8',
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -37,6 +41,7 @@ function loadCalendars(callback) {
     jQuery.ajax({
         type: "GET",
         url: '/WebSchedule/loadCalendars',
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -52,6 +57,7 @@ function getCalendarByid(calendar_id, callback) {
         url: '/WebSchedule/getCalendarByid',
         processData: false,
         data: "id=" + calendar_id,
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -67,6 +73,7 @@ function addNewCalendar(pdata, callback) {
         url: '/WebSchedule/addNewCalendar' + _csrf,
         data: JSON.stringify(pdata),
         contentType: 'application/json; charset=UTF-8',
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -82,6 +89,7 @@ function updateCalendar(pdata, callback) {
         url: '/WebSchedule/updateCalendar' + _csrf,
         data: JSON.stringify(pdata),
         contentType: 'application/json; charset=UTF-8',
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -95,6 +103,7 @@ function deleteCalendar(id, callback) {
     jQuery.ajax({
         type: "DELETE",
         url: '/WebSchedule/deleteCalendar' + _csrf + "&id=" + id,
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -109,6 +118,7 @@ function getDefaultCalendar(callback) {
     jQuery.ajax({
         type: "GET",
         url: '/WebSchedule/getDefaultCalendar',
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -123,6 +133,7 @@ function setDefaultCalendar(calendar_id, callback) {
     jQuery.ajax({
         type: "PUT",
         url: '/WebSchedule/setDefaultCalendar' + _csrf + "&id=" + calendar_id,
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -141,6 +152,7 @@ function setSelectedCalendar(selectedC, callback) {
     jQuery.ajax({
         type: "PUT",
         url: '/WebSchedule/setSelectedCalendar' + _csrf + selectedC_p,
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -157,6 +169,7 @@ function loadEvents(start, end, callback) {
         type: "GET",
         url: '/WebSchedule/loadEvents',
         data: "start=" + start + "&end=" + end,
+        dataType: "json",
         success: function (result) {
             for(var t=0; t<result.length; t++){
                 result[t].textColor = $c.complement(result[t].color);
@@ -175,6 +188,7 @@ function loadTasksByProject(project_id, callback) {
         type: "GET",
         url: '/WebSchedule/loadTasksByProject',
         data: "id=" + project_id,
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -189,6 +203,7 @@ function loadTasksByProjectByGroup(project_id, callback) {
         type: "GET",
         url: '/WebSchedule/loadTasksByProject/group',
         data: "id=" + project_id,
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -203,6 +218,7 @@ function loadTasksByLabel(label_id, callback) {
         type: "GET",
         url: '/WebSchedule/loadTasksByLabel',
         data: "id=" + label_id,
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -217,6 +233,7 @@ function loadTasksBySearch(searchTerm, callback) {
         type: "GET",
         url: '/WebSchedule/loadTasksBySearch',
         data: "searchTerm=" + encodeURIComponent(searchTerm),
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -233,6 +250,7 @@ function getDefaultProject(callback) {
     jQuery.ajax({
         type: "GET",
         url: '/WebSchedule/getDefaultProject',
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -247,6 +265,7 @@ function setDefaultProject(project_id, callback) {
     jQuery.ajax({
         type: "PUT",
         url: '/WebSchedule/setDefaultProject' + _csrf + "&id=" + project_id,
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -263,6 +282,7 @@ function loadTaskData(task_id, callback) {
         type: "GET",
         url: '/WebSchedule/loadTaskData',
         data: "id=" + task_id,
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -277,6 +297,7 @@ function getParentTaskProject(parent_id, callback) {
         type: "GET",
         url: '/WebSchedule/getParentTaskProject',
         data: "parent_id=" + parent_id,
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -322,6 +343,7 @@ function loadInitialTaskData(calendar_id, project_id, parent_id, selectedStart, 
         type: "GET",
         url: '/WebSchedule/loadInitialTaskData',
         data: sParentid + sStart + sEnd + sProject + sCal + sInsert + sLabels,
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -337,6 +359,7 @@ function saveTaskData(taskData, callback) {
         url: '/WebSchedule/saveTaskData' + _csrf,
         data: JSON.stringify(taskData),
         contentType: 'application/json; charset=UTF-8',
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -350,6 +373,7 @@ function updateTaskTitle(id, new_title, callback) {
     jQuery.ajax({
         type: "PUT",
         url: '/WebSchedule/updateTaskTitle' + _csrf + "&id=" + id + "&new_title=" + encodeURIComponent(new_title),
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -363,6 +387,7 @@ function deleteTaskData(id, callback) {
     jQuery.ajax({
         type: "DELETE",
         url: '/WebSchedule/deleteTaskData' + _csrf + "&id=" + id,
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -375,6 +400,7 @@ function deleteRCurrentTaskData(id, date, callback) {
     jQuery.ajax({
         type: "DELETE",
         url: '/WebSchedule/deleteRCurrentTaskData' + _csrf + "&id=" + id + "&date=" + date,
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -387,6 +413,7 @@ function deleteRAllTaskData(id, callback) {
     jQuery.ajax({
         type: "DELETE",
         url: '/WebSchedule/deleteRAllTaskData' + _csrf + "&id=" + id,
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -408,6 +435,7 @@ function loadTaskRepeatDataCurrentEvent(task_id, start, end, callback) {
         type: "GET",
         url: '/WebSchedule/loadTaskRepeatDataCurrentEvent',
         data: params,
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -424,6 +452,7 @@ function loadProjects(callback) {
     jQuery.ajax({
         type: "GET",
         url: '/WebSchedule/loadProjects',
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -439,6 +468,7 @@ function getProjectByid(project_id, callback) {
         url: '/WebSchedule/getProjectByid',
         processData: false,
         data: "id=" + project_id,
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -474,6 +504,7 @@ function addNewProject(pdata, callback) {
         url: '/WebSchedule/addNewProject' + _csrf,
         data: JSON.stringify(pdata),
         contentType: 'application/json; charset=UTF-8',
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -489,6 +520,7 @@ function updateProject(pdata, callback) {
         url: '/WebSchedule/updateProject' + _csrf,
         data: JSON.stringify(pdata),
         contentType: 'application/json; charset=UTF-8',
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -501,6 +533,7 @@ function deleteProject(id, callback) {
     jQuery.ajax({
         type: "DELETE",
         url: '/WebSchedule/deleteProject' + _csrf + "&id=" + id,
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -517,6 +550,7 @@ function loadLabels(callback) {
     jQuery.ajax({
         type: "GET",
         url: '/WebSchedule/loadLabels',
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -532,6 +566,7 @@ function getLabelById(lid, callback) {
         url: '/WebSchedule/getLabelByid',
         processData: false,
         data: "id=" + lid,
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -547,6 +582,7 @@ function addNewLabel(pdata, callback) {
         url: '/WebSchedule/addNewLabel' + _csrf,
         data: JSON.stringify(pdata),
         contentType: 'application/json; charset=UTF-8',
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -562,6 +598,7 @@ function updateLabel(pdata, callback) {
         url: '/WebSchedule/updateLabel' + _csrf,
         data: JSON.stringify(pdata),
         contentType: 'application/json; charset=UTF-8',
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -575,6 +612,7 @@ function deleteLabel(id, callback) {
     jQuery.ajax({
         type: "DELETE",
         url: '/WebSchedule/deleteLabel' + _csrf + "&id=" + id,
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -590,6 +628,7 @@ function saveOrUpdateGS(gs_data, callback) {
         url: '/WebSchedule/gs' + _csrf,
         data: JSON.stringify(gs_data),
         contentType: 'application/json; charset=UTF-8',
+        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -607,6 +646,7 @@ function findGS(view, value, callback) {
         accept: "application/json; charset=utf-8",         
         contentType: "application/json; charset=utf-8"  ,
         data: "selectedView=" + view + "&selectedId=" + value,
+        dataType: "json",
         success: function (result) {
             callback(result);
         },

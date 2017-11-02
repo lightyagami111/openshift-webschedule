@@ -77,7 +77,15 @@
                             <i class="fa fa-calendar"></i>
                         </a> 
                     </li>  
-                    <a href="/WebSchedule/m" class="btn btn-default" role="button">manage</a>
+                    <li>
+                        <a href="/WebSchedule/m" class="btn btn-default" role="button">M</a>     
+                    </li>
+                    <li>
+                        <form method="post" action="${pageContext.request.contextPath}/logout">
+                            <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>         
+                            <button type="submit" class="btn btn-default" role="button">OUT</button>
+                        </form> 
+                    </li>
                 </ul>     
 
                 <div class="navbar-default sidebar" role="navigation" style="padding-top: 10px;">
@@ -200,6 +208,6 @@
         <script src="resources/indexProjectsMenu.js?1574"></script>        
         <script src="resources/indexTaskLists.js?1574"></script>
         <script src="resources/indexCalendars.js?1575"></script>
-        
+
     </body>
 </html>

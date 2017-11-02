@@ -181,6 +181,16 @@
             <artifactId>spring-security-web</artifactId>
             <version>${org.springframework.security-version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-config</artifactId>
+            <version>${org.springframework.security-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-taglibs</artifactId>
+            <version>${org.springframework.security-version}</version>
+        </dependency>
         
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
@@ -233,8 +243,14 @@
             </snapshots>
         </repository>
     </repositories>
-
+    
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>                
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -283,5 +299,26 @@
             </plugin>
         </plugins>
     </build>
-
+    
+    
+    <profiles>
+        <profile>
+            <id>dev</id>
+            <properties>
+                <pom.jdbc.url>jdbc:mysql://localhost:3306/webschedule?useSSL=false&amp;characterEncoding=utf-8&amp;useUnicode=true</pom.jdbc.url>
+                <pom.jdbc.username>app_dev_1</pom.jdbc.username>
+                <pom.jdbc.password>app_dev_1</pom.jdbc.password>
+            </properties>
+        </profile>
+        <profile>
+            <id>openshift</id>
+            <properties>
+                <pom.jdbc.url>jdbc:mysql://mysql:3306//webschedule?useSSL=false&amp;characterEncoding=utf-8&amp;useUnicode=true</pom.jdbc.url>
+                <pom.jdbc.username>userVBV</pom.jdbc.username>
+                <pom.jdbc.password>WFJygk2FWsdyy8pV</pom.jdbc.password>
+            </properties>
+        </profile>
+    </profiles>
+    
+    
 </project>
