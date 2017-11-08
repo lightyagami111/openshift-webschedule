@@ -7,22 +7,17 @@ package com.webschedule.design.datastructure;
 
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 
 /**
  *
  * @author asd
  */
 @Entity
-@Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class EventException implements Serializable {
     
     @Id
@@ -33,7 +28,6 @@ public class EventException implements Serializable {
     private Date dateException;   
     
     @ManyToOne
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private TaskRepeatDataEntity taskRepeatDataEntity;
 
     public Long getId() {

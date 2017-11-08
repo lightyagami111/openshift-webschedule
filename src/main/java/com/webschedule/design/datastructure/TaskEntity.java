@@ -9,7 +9,6 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -19,8 +18,6 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Temporal;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.search.annotations.Field;
 import org.hibernate.search.annotations.Indexed;
 
@@ -29,8 +26,6 @@ import org.hibernate.search.annotations.Indexed;
  * @author ivaylo
  */
 @Entity
-@Cacheable
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Indexed
 public class TaskEntity implements Serializable {
     
@@ -39,11 +34,9 @@ public class TaskEntity implements Serializable {
     private Long id;
     
     @ManyToOne(fetch = FetchType.EAGER)
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private ProjectEntity project;
     
     @ManyToOne(fetch = FetchType.EAGER)
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     private CalendarEntity calendar;
     
     @Field
@@ -64,11 +57,9 @@ public class TaskEntity implements Serializable {
     private Boolean allDay;
     
     
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @ManyToMany(fetch = FetchType.EAGER)    
     private Set<LabelEntity> labels = new HashSet<>();
     
-    @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
     @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<LinkEntity> links = new HashSet<>();
     
