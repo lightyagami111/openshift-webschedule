@@ -310,7 +310,7 @@
             <properties>
                 <pom.jdbc.url>jdbc:mysql://mysql:3306//webschedule?useSSL=false&amp;characterEncoding=utf-8&amp;useUnicode=true</pom.jdbc.url>
                 <pom.jdbc.username>userVBV</pom.jdbc.username>
-                <pom.jdbc.password>WFJygk2FWsdyy8pV</pom.jdbc.password>
+                <pom.jdbc.password>q2SosiDcF4148vry</pom.jdbc.password>
             </properties>
         </profile>
     </profiles>
