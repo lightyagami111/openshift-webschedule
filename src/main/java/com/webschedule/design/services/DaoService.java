@@ -298,6 +298,7 @@ public class DaoService {
 
     public void saveOrUpdate(TaskRepeatDataEntity t) {
         getCurrentSession().saveOrUpdate(t);
+        getCurrentSession().flush();
     }
 
     public List<TaskRepeatDataEntity> findRepeatableTasks() {
@@ -317,6 +318,8 @@ public class DaoService {
             ee.setTaskRepeatDataEntity(rep);
             ee.setDateException(date);
             save(ee);
+            rep.getEventsEx().add(ee);
+            saveOrUpdate(rep);
         } else {
             deleteDateData(task_id);
         }
@@ -342,6 +345,8 @@ public class DaoService {
     }
 
     public void deleteEventExceptions(TaskRepeatDataEntity rep) {
+        rep.setEventsEx(null);
+        saveOrUpdate(rep);        
         getCurrentSession().createQuery("DELETE FROM EventException e WHERE e.taskRepeatDataEntity.id = :_rep_id")
                 .setParameter("_rep_id", rep.getId())
                 .executeUpdate();

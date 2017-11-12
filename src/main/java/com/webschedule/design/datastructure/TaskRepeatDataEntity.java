@@ -5,6 +5,7 @@
  */
 package com.webschedule.design.datastructure;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -37,6 +38,7 @@ public class TaskRepeatDataEntity implements Serializable {
     
     @OneToOne
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnore
     private TaskEntity task;
     
     private String mode;
@@ -62,6 +64,7 @@ public class TaskRepeatDataEntity implements Serializable {
     
     @OneToMany(fetch = FetchType.EAGER)
     @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+    @JsonIgnore
     private List<EventException> eventsEx;
 
     public Long getId() {
