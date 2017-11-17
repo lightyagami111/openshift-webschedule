@@ -456,13 +456,6 @@ public class BaseController {
         return ResponseEntity.ok(groupAndSortService.getExistingOrDefault(view, id));
     }
 
-    @RequestMapping(value = {"/createIndex"}, method = RequestMethod.GET)
-    public @ResponseBody
-    ResponseEntity createIndex() {
-        int r = daoService.createIndex();
-        return ResponseEntity.ok(r);
-    }
-
     @RequestMapping(value = {"/loadTasksBySearch"}, method = RequestMethod.GET)
     public @ResponseBody
     GroupSortResponseDTO loadTasksBySearch(@RequestParam(value = "searchTerm") String searchTerm) {

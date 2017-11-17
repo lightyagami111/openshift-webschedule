@@ -9,58 +9,38 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
-import org.hibernate.search.annotations.Field;
-import org.hibernate.search.annotations.Indexed;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  *
  * @author ivaylo
  */
-@Entity
-@Indexed
+@Document
 public class TaskEntity implements Serializable {
     
     @Id
-    @GeneratedValue
     private Long id;
     
-    @ManyToOne(fetch = FetchType.EAGER)
     private ProjectEntity project;
     
-    @ManyToOne(fetch = FetchType.EAGER)
     private CalendarEntity calendar;
     
-    @Field
     private String text;
     private String parent;
     private String parent_text;
     
-    @Field
-    @Column(columnDefinition="TEXT")
     private String notes;
     
     private Integer priority;
     
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date start;    
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date end;
     private Boolean allDay;
     
     
-    @ManyToMany(fetch = FetchType.EAGER)    
     private Set<LabelEntity> labels = new HashSet<>();
     
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Set<LinkEntity> links = new HashSet<>();
     
 

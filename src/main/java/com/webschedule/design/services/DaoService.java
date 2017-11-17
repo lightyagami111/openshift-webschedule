@@ -18,13 +18,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import org.hibernate.Session;
-import org.hibernate.search.FullTextQuery;
-import org.hibernate.search.FullTextSession;
-import org.hibernate.search.Search;
-import org.hibernate.search.query.dsl.QueryBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.orm.hibernate4.HibernateTransactionManager;
+import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,82 +37,47 @@ public class DaoService {
     static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(DaoService.class.getName());
 
     @Autowired
-    private HibernateTransactionManager hibernateTransactionManager;
-
-    private Session getCurrentSession() {
-        return hibernateTransactionManager.getSessionFactory().getCurrentSession();
-    }
-
-    private FullTextSession getCurrentFullTextSession() {
-        return Search.getFullTextSession(getCurrentSession());
-    }
-
-    public int createIndex() {
-        getCurrentFullTextSession().purgeAll(TaskEntity.class);
-        try {
-            getCurrentFullTextSession().createIndexer().startAndWait();
-        } catch (InterruptedException ex) {
-            log.error(ex.getMessage(), ex);
-            return 1;
-        }
-        return 0;
-    }
+    private MongoTemplate mongoTemplate;
 
     public List<TaskEntity> search(String searchTerm) {
-        QueryBuilder qb = getCurrentFullTextSession().getSearchFactory().buildQueryBuilder().forEntity(TaskEntity.class).get();
-        org.apache.lucene.search.Query luceneQuery = qb
-                .keyword().wildcard()
-                .onField("text")
-                .andField("notes")
-                .matching(searchTerm + "*")
-                .createQuery();
-
-        FullTextQuery fq = getCurrentFullTextSession().createFullTextQuery(luceneQuery, TaskEntity.class);
-
-        return fq.list();
+        throw new UnsupportedOperationException("search");
     }
 
     public void persist(ProjectEntity p) {
-        getCurrentSession().persist(p);
+        mongoTemplate.save(p);
     }
 
     public List<ProjectEntity> findAllProjects() {
-        return getCurrentSession().createQuery("SELECT p FROM ProjectEntity p").list();
+        return mongoTemplate.findAll(ProjectEntity.class);
     }
 
     public ProjectEntity findProjectById(Long id) {
-        ProjectEntity p = null;
-        List list = getCurrentSession().createQuery("SELECT p FROM ProjectEntity p WHERE p.id = :_id").setParameter("_id", id).list();
-        if (list != null && !list.isEmpty()) {
-            p = (ProjectEntity) list.get(0);
-        }
-        return p;
+        return mongoTemplate.findById(id, ProjectEntity.class);
     }
 
     public void updateProject(ProjectEntity p) {
-        getCurrentSession().merge(p);
+        mongoTemplate.save(p);
     }
 
     public void deleteProject(Long id) {
         ProjectEntity p = findProjectById(id);
-        List<ProjectEntity> children = getCurrentSession().createQuery("SELECT p FROM ProjectEntity p WHERE p.parent = :_pid").setParameter("_pid", String.valueOf(id)).list();
+        Query query1 = new Query();
+        query1.addCriteria(Criteria.where("parent").is(id.toString()));
+        List<ProjectEntity> children = mongoTemplate.find(query1, ProjectEntity.class);
         if (children != null && !children.isEmpty()) {
             for (ProjectEntity children1 : children) {
-                getCurrentSession().delete(children1);
+                mongoTemplate.remove(children1);
             }
         }
-        getCurrentSession().delete(p);
+        mongoTemplate.remove(p);
 
         deleteGroupAndSort("projects", String.valueOf(id));
     }
 
     public ProjectEntity findDefaultProject() {
-        ProjectEntity p = null;
-        List list = getCurrentSession().createQuery("SELECT p FROM ProjectEntity p WHERE p.defaultProject = TRUE").list();
-        if (list != null && !list.isEmpty()) {
-            p = (ProjectEntity) list.get(0);
-        }
-        return p;
+        Query query1 = new Query();
+        query1.addCriteria(Criteria.where("defaultProject").is(Boolean.TRUE));
+        return mongoTemplate.findOne(query1, ProjectEntity.class);
     }
 
     public void setDefaultProject(Long id) {
@@ -133,47 +96,48 @@ public class DaoService {
     // CALENDARS
     //--------------------------------------------------------------------------
     public void persist(CalendarEntity ce) {
-        getCurrentSession().persist(ce);
+        mongoTemplate.save(ce);
     }
 
     public void update(CalendarEntity ce) {
-        getCurrentSession().merge(ce);
+        mongoTemplate.save(ce);
     }
 
     public List<CalendarEntity> findAllCalendars() {
-        return getCurrentSession().createQuery("SELECT ce FROM CalendarEntity ce").list();
+        return mongoTemplate.findAll(CalendarEntity.class);
     }
 
     public List<CalendarEntity> findSelectedCalendars() {
-        return getCurrentSession().createQuery("SELECT ce FROM CalendarEntity ce WHERE ce.selected = true").list();
+        Query query1 = new Query();
+        query1.addCriteria(Criteria.where("selected").is(Boolean.TRUE));
+        return mongoTemplate.find(query1, CalendarEntity.class);
     }
 
     public CalendarEntity findCalendarById(Long id) {
-        return (CalendarEntity) getCurrentSession()
-                .createQuery("SELECT ce FROM CalendarEntity ce WHERE ce.id = :_id")
-                .setParameter("_id", id)
-                .uniqueResult();
+        return mongoTemplate.findById(id, CalendarEntity.class);
     }
 
     public void deleteCalendar(Long id) {
-        CalendarEntity findDefaultCalendar = findDefaultCalendar();
-        getCurrentSession()
-                .createQuery("UPDATE TaskEntity t SET t.calendar = :_cal WHERE t.calendar.id = :_id")
-                .setParameter("_id", id)
-                .setParameter("_cal", findDefaultCalendar)
-                .executeUpdate();
-        CalendarEntity ce = findCalendarById(id);
-        getCurrentSession().delete(ce);
+        
+        Query query1 = new Query();
+        query1.addCriteria(Criteria.where("calendar.id").is(id));
+        
+        Update updateFields = new Update();
+        updateFields.set("calendar", findDefaultCalendar());
+        
+        mongoTemplate.updateMulti(query1, updateFields, TaskEntity.class);
+        
+       CalendarEntity ce = findCalendarById(id);       
+       mongoTemplate.remove(ce);
+       
     }
 
     
     public CalendarEntity findDefaultCalendar() {
-        CalendarEntity p = null;
-        List list = getCurrentSession().createQuery("SELECT p FROM CalendarEntity p WHERE p.defaultCalendar = TRUE").list();
-        if (list != null && !list.isEmpty()) {
-            p = (CalendarEntity) list.get(0);
-        }
-        return p;
+        Query query1 = new Query();
+        query1.addCriteria(Criteria.where("defaultCalendar").is(Boolean.TRUE));
+        
+        return mongoTemplate.findOne(query1, CalendarEntity.class);
     }
 
     public void setDefaultCalendar(Long id) {
@@ -194,29 +158,24 @@ public class DaoService {
     // LABELS
     //--------------------------------------------------------------------------
     public void persist(LabelEntity p) {
-        getCurrentSession().persist(p);
+        mongoTemplate.save(p);
     }
 
     public List<LabelEntity> findAllLabels() {
-        return getCurrentSession().createQuery("SELECT p FROM LabelEntity p").list();
+        return mongoTemplate.findAll(LabelEntity.class);
     }
 
     public LabelEntity findLabelById(Long id) {
-        LabelEntity p = null;
-        List list = getCurrentSession().createQuery("SELECT p FROM LabelEntity p WHERE p.id = :_id").setParameter("_id", id).list();
-        if (list != null && !list.isEmpty()) {
-            p = (LabelEntity) list.get(0);
-        }
-        return p;
+        return mongoTemplate.findById(id, LabelEntity.class);
     }
 
     public void updateLabel(LabelEntity p) {
-        getCurrentSession().merge(p);
+        mongoTemplate.save(p);
     }
 
     public void deleteLabel(Long id) {
         LabelEntity p = findLabelById(id);
-        getCurrentSession().delete(p);
+        mongoTemplate.remove(p);
 
         deleteGroupAndSort("labels", String.valueOf(id));
     }
@@ -225,11 +184,12 @@ public class DaoService {
     // TASKS
     //--------------------------------------------------------------------------
     public Long save(TaskEntity p) {
-        return (Long) getCurrentSession().save(p);
+        mongoTemplate.save(p);
+        return p.getId();
     }
 
     public void saveOrUpdate(TaskEntity t) {
-        getCurrentSession().saveOrUpdate(t);
+        mongoTemplate.save(t);
     }
 
     public void deleteDateData(Long task_id) {
@@ -241,29 +201,37 @@ public class DaoService {
     }
 
     public TaskEntity findTaskById(Long id) {
-        TaskEntity p = null;
-        List list = getCurrentSession().createQuery("SELECT p FROM TaskEntity p WHERE p.id = :_id").setParameter("_id", id).list();
-        if (list != null && !list.isEmpty()) {
-            p = (TaskEntity) list.get(0);
-        }
-        return p;
+        return mongoTemplate.findById(id, TaskEntity.class);
     }
 
     public List<TaskEntity> loadTasksByProject(Long project_id) {
-        return getCurrentSession().createQuery("SELECT p FROM TaskEntity p WHERE p.project.id = :_id").setParameter("_id", project_id).list();
+        Query query1 = new Query();
+        query1.addCriteria(Criteria.where("project.id").is(project_id));
+        
+        return mongoTemplate.find(query1, TaskEntity.class);
     }
 
     public Long countTasksById(Long project_id) {
-        return (Long) getCurrentSession().createQuery("SELECT COUNT(*) FROM TaskEntity p WHERE p.project.id = :_id").setParameter("_id", project_id).uniqueResult();
+        Query query1 = new Query();
+        query1.addCriteria(Criteria.where("project.id").is(project_id));
+        
+        return mongoTemplate.count(query1, TaskEntity.class);        
     }
 
     public List<TaskEntity> loadTaskByLabel(Long label_id) {
-        return getCurrentSession().createQuery("SELECT p FROM TaskEntity p JOIN p.labels pl WHERE pl.id = :_id").setParameter("_id", label_id).list();
+        Query query1 = new Query();
+        query1.addCriteria(Criteria.where("labels.id").is(label_id));
+        
+        return mongoTemplate.find(query1, TaskEntity.class);
     }
 
     public List<TaskEntity> findAllSubtasks(String parent_id) {
         List<TaskEntity> resultList = new ArrayList<>();
-        List<TaskEntity> list = getCurrentSession().createQuery("SELECT p FROM TaskEntity p WHERE p.parent = :_id").setParameter("_id", parent_id).list();
+        
+        Query query1 = new Query();
+        query1.addCriteria(Criteria.where("parent").is(parent_id));
+        
+        List<TaskEntity> list = mongoTemplate.find(query1, TaskEntity.class);
         if (!list.isEmpty()) {
             resultList.addAll(list);
             for (TaskEntity taskEntity : list) {
@@ -278,37 +246,35 @@ public class DaoService {
         List<TaskEntity> findAllSubtasks = findAllSubtasks(String.valueOf(t.getId()));
         for (TaskEntity subTask : findAllSubtasks) {
             deleteTaskRepeatDataEntity(subTask.getId());
-            getCurrentSession().delete(subTask);
+            mongoTemplate.remove(subTask);
         }
         deleteTaskRepeatDataEntity(t.getId());
-        getCurrentSession().delete(t);
+        mongoTemplate.remove(t);
     }
 
     //--------------------------------------------------------------------------
     // TASK REPEAT DATA
     //--------------------------------------------------------------------------
     public TaskRepeatDataEntity findRepeatDataByTaskId(Long id) {
-        TaskRepeatDataEntity p = null;
-        List list = getCurrentSession().createQuery("SELECT p FROM TaskRepeatDataEntity p WHERE p.task.id = :_id").setParameter("_id", id).list();
-        if (list != null && !list.isEmpty()) {
-            p = (TaskRepeatDataEntity) list.get(0);
-        }
-        return p;
+        Query query1 = new Query();
+        query1.addCriteria(Criteria.where("task.id").is(id));
+        
+        return mongoTemplate.findOne(query1, TaskRepeatDataEntity.class);
     }
 
     public void saveOrUpdate(TaskRepeatDataEntity t) {
-        getCurrentSession().saveOrUpdate(t);
-        getCurrentSession().flush();
+        mongoTemplate.save(t);
     }
 
     public List<TaskRepeatDataEntity> findRepeatableTasks() {
         List<CalendarEntity> findSelected = findSelectedCalendars();
         List<Long> findSelectedIds = Lambda.extract(findSelected, Lambda.on(CalendarEntity.class).getId());
         findSelectedIds.add(Long.MIN_VALUE);
-        return getCurrentSession()
-                .createQuery("SELECT p FROM TaskRepeatDataEntity p WHERE p.task.calendar.id IN (:_findSelectedIds)")
-                .setParameterList("_findSelectedIds", findSelectedIds)
-                .list();
+        
+        Query query1 = new Query();
+        query1.addCriteria(Criteria.where("task.calendar.id").in(findSelectedIds));
+        
+        return mongoTemplate.find(query1, TaskRepeatDataEntity.class);
     }
 
     public void deleteCurrentEvent(Long task_id, Date date) {
@@ -329,27 +295,30 @@ public class DaoService {
         TaskRepeatDataEntity rep = findRepeatDataByTaskId(task_id);
         if (rep != null) {
             deleteEventExceptions(rep);
-            getCurrentSession().delete(rep);
+            mongoTemplate.remove(rep);
         }
         deleteDateData(task_id);
     }
 
     public void save(EventException ee) {
-        getCurrentSession().save(ee);
+        mongoTemplate.remove(ee);
     }
 
     public List<EventException> findEventExceptions(TaskRepeatDataEntity te) {
-        return getCurrentSession().createQuery("SELECT e FROM EventException e WHERE e.taskRepeatDataEntity.id = :_id")
-                .setParameter("_id", te.getId())
-                .list();
+        Query query1 = new Query();
+        query1.addCriteria(Criteria.where("taskRepeatDataEntity.id").is(te.getId()));
+        
+        return mongoTemplate.find(query1, EventException.class);
     }
 
     public void deleteEventExceptions(TaskRepeatDataEntity rep) {
         rep.setEventsEx(null);
-        saveOrUpdate(rep);        
-        getCurrentSession().createQuery("DELETE FROM EventException e WHERE e.taskRepeatDataEntity.id = :_rep_id")
-                .setParameter("_rep_id", rep.getId())
-                .executeUpdate();
+        saveOrUpdate(rep);    
+        
+        Query query1 = new Query();
+        query1.addCriteria(Criteria.where("taskRepeatDataEntity.id").is(rep.getId()));
+        
+        mongoTemplate.remove(query1, TaskRepeatDataEntity.class);
     }
 
     //--------------------------------------------------------------------------
@@ -361,7 +330,7 @@ public class DaoService {
             LinkEntity next = (LinkEntity) iterator1.next();
             iterator1.remove();
             saveOrUpdate(task);
-            getCurrentSession().delete(next);
+            mongoTemplate.remove(next);
         }
     }
 
@@ -372,15 +341,18 @@ public class DaoService {
         List<CalendarEntity> findSelected = findSelectedCalendars();
         List<Long> findSelectedIds = Lambda.extract(findSelected, Lambda.on(CalendarEntity.class).getId());
         findSelectedIds.add(Long.MIN_VALUE);
-        return getCurrentSession()
-                .createQuery("SELECT p FROM TaskEntity p"
-                        + " WHERE ((p.start BETWEEN :_start and :_end) OR (p.end BETWEEN :_start and :_end)"
-                        + " OR (:_start BETWEEN p.start and p.end) OR (:_end BETWEEN p.start and p.end))"
-                        + " AND p.calendar.id IN (:_findSelectedIds)")
-                .setParameter("_start", start)
-                .setParameter("_end", end)
-                .setParameterList("_findSelectedIds", findSelectedIds)
-                .list();
+        
+        Criteria c0 = Criteria.where("calendar.id").in(findSelectedIds);
+        
+        Criteria c1 = Criteria.where("start").gte(start).lte(end);
+        Criteria c2 = Criteria.where("end").gte(start).lte(end);
+        Criteria c3 = Criteria.where("start").lte(start).and("end").gte(start);
+        Criteria c4 = Criteria.where("start").lte(end).and("end").gte(end);                                
+        
+        Query query1 = new Query();
+        query1.addCriteria(c0.orOperator(c1.orOperator(c2,c3,c4)));
+        
+        return mongoTemplate.find(query1, TaskEntity.class);
     }
 
     
@@ -388,22 +360,21 @@ public class DaoService {
     // GROUP && SORT 
     //--------------------------------------------------------------------------
     public void saveOrUpdate(GroupSortEntity t) {
-        getCurrentSession().saveOrUpdate(t);
+        mongoTemplate.save(t);
     }
 
     public GroupSortEntity findGSBySelectedViewAndId(String view, String id) {
-        return (GroupSortEntity) getCurrentSession()
-                .createQuery("FROM GroupSortEntity gs WHERE gs.selectedView = :_selectedView AND gs.selectedId = :_selectedId")
-                .setParameter("_selectedView", view)
-                .setParameter("_selectedId", id)
-                .uniqueResult();
+        Query query1 = new Query();
+        query1.addCriteria(Criteria.where("selectedView").is(view).and("selectedId").is(id));
+        
+        return mongoTemplate.findOne(query1, GroupSortEntity.class);
     }
 
     public void deleteGroupAndSort(String view, String id) {
-        getCurrentSession().createQuery("DELETE FROM GroupSortEntity gs WHERE gs.selectedView = :_selectedView AND gs.selectedId = :_selectedId")
-                .setParameter("_selectedView", view)
-                .setParameter("_selectedId", id)
-                .executeUpdate();
+        Query query1 = new Query();
+        query1.addCriteria(Criteria.where("selectedView").is(view).and("selectedId").is(id));
+        
+        mongoTemplate.remove(query1, GroupAndSortService.class);
     }
 
 }

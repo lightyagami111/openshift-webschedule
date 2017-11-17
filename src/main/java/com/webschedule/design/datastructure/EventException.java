@@ -7,27 +7,21 @@ package com.webschedule.design.datastructure;
 
 import java.io.Serializable;
 import java.util.Date;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.Temporal;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  *
  * @author asd
  */
-@Entity
+@Document
 public class EventException implements Serializable {
     
     @Id
-    @GeneratedValue
     private Long id;
     
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date dateException;   
-    
-    @ManyToOne
+        
     private TaskRepeatDataEntity taskRepeatDataEntity;
 
     public Long getId() {

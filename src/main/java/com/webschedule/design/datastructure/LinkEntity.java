@@ -6,26 +6,20 @@
 package com.webschedule.design.datastructure;
 
 import java.io.Serializable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  *
  * @author asd
  */
-@Entity
+@Document
 public class LinkEntity implements Serializable {
     
     @Id
-    @GeneratedValue
     private Long id;
     
-    @Column(columnDefinition="VARCHAR(255)")
     private String title;
-    
-    @Column(columnDefinition="TEXT")
     private String url;
 
     public Long getId() {

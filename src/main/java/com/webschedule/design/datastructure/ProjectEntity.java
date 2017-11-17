@@ -6,21 +6,19 @@
 package com.webschedule.design.datastructure;
 
 import java.io.Serializable;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  *
  * @author ivaylo
  */
-@Entity
+@Document
 public class ProjectEntity implements Serializable {    
         
     @Id
-    @GeneratedValue
     private Long id;
     
     @NotNull

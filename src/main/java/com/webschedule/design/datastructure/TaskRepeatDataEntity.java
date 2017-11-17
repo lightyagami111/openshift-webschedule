@@ -11,41 +11,31 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.Temporal;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
  *
  * @author ivaylo
  */
-@Entity
+@Document
 public class TaskRepeatDataEntity implements Serializable {
     
     @Id
-    @GeneratedValue
     private Long id;
     
-    @OneToOne
     @JsonIgnore
     private TaskEntity task;
     
     private String mode;
     
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date mode_start;
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date mode_end;
     private Boolean allDay;
     
     
     private String endson;
-    @Temporal(javax.persistence.TemporalType.TIMESTAMP)
     private Date endson_until;    
     private Integer endson_count;
     
@@ -56,7 +46,6 @@ public class TaskRepeatDataEntity implements Serializable {
     private Integer repeat_months;
     private String repeatby;
     
-    @OneToMany(fetch = FetchType.EAGER)
     @JsonIgnore
     private List<EventException> eventsEx;
 
