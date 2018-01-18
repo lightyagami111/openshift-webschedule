@@ -16,8 +16,7 @@ $(document).ready(function () {
     loadCalendars(function (result) {
         loadCalendarsAjaxCallback(result);        
     });
-    
-    fullCalendarOptions();
+        
 
     
 

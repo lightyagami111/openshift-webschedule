@@ -18,7 +18,7 @@ import javax.persistence.Temporal;
  * @author asd
  */
 @Entity
-public class EventException implements Serializable {
+public class EventExceptionEntity implements Serializable {
     
     @Id
     @GeneratedValue

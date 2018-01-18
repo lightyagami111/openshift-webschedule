@@ -1,5 +1,6 @@
 package com.webschedule.design.controllers;
 
+import ch.lambdaj.Lambda;
 import com.webschedule.design.datastructure.CalendarEntity;
 import com.webschedule.design.datastructure.CalendarUIEventDTO;
 import com.webschedule.design.datastructure.GroupSortDTO;
@@ -209,14 +210,15 @@ public class BaseController {
 
     @RequestMapping(value = {"/loadTasksByLabel"}, method = RequestMethod.GET)
     public @ResponseBody
-    GroupSortResponseDTO loadTasksByLabel(@RequestParam(value = "id") Long id) {
-        LabelEntity le = daoService.findLabelById(id);
-        GroupSortEntity gs = groupAndSortService.getExistingOrDefault("labels", String.valueOf(id));
-        List<TaskEntity> tasks = daoService.loadTaskByLabel(id);
+    GroupSortResponseDTO loadTasksByLabel() {
+        List<Long> ids = Lambda.extract(daoService.findSelectedLabels(), Lambda.on(LabelEntity.class).getId());
+        List<LabelEntity> le = daoService.findLabelById(ids);
+        GroupSortEntity gs = groupAndSortService.getExistingOrDefault("labels", String.valueOf(ids));
+        List<TaskEntity> tasks = daoService.loadTaskByLabel(ids);
         List<GroupSortDTO> groups = tasksService.groupAndSort(gs, tasks);
 
         GroupSortResponseDTO result = new GroupSortResponseDTO();
-        result.setView(le.getText());
+        result.setView(Lambda.extract(le, Lambda.on(LabelEntity.class).getText()) + "");
         result.setGroups(groups);
         result.setAllowNewTaskAction(groupAndSortService.allowNewTaskAction(gs));
 
@@ -401,6 +403,20 @@ public class BaseController {
     ResponseEntity deleteLabel(@RequestParam(value = "id") Long id) {
         daoService.deleteLabel(id);
         return ResponseEntity.ok(id);
+    }
+    
+    @ResponseStatus(HttpStatus.OK)
+    @RequestMapping(value = {"/setSelectedLabel"}, method = RequestMethod.PUT)
+    public void setSelectedLabel(@RequestParam(value = "ids") List<Long> ids) {
+        List<LabelEntity> findAll = daoService.findAllLabels();
+        for (LabelEntity ce : findAll) {
+            if (ids.contains(ce.getId())) {
+                ce.setSelected(Boolean.TRUE);
+            } else {
+                ce.setSelected(Boolean.FALSE);
+            }
+            daoService.updateLabel(ce);
+        }
     }
 
     //--------------------------------------------------------------------------

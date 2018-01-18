@@ -1,34 +1,57 @@
 var selectizeDesktop;
 var selectizeModal;
 
-function loadLabelsAjaxCallback(data_labels) {
-    fillDropdownLabel($('#sch_labels'), data_labels, function (data) {
-        showTasksWrapper();
-        hideCalendarWrapper();
-        deselectProjectMenu();
+var selectedLabelsId = [];
 
-        selectedView = 'labels';
-        selectedValue = $(this).attr('data-id');
-        setGroupAndSort();
-        refreshData();
-    });
+function loadLabelsAjaxCallback(data_labels) {
+    fillDropdownLabel(data_labels);
 
     selectizeDesktop = selectizeLabels('#formBodyDesktop form fieldset .labels .labels-sch', data_labels);
     selectizeMobile = selectizeLabels('#formBodyModal form fieldset .labels .labels-sch', data_labels);
+    
+    $('#showLabels').on('click', function() {
+        showLabels();
+    });
 }
 
 
-function fillDropdownLabel(ulElemnt, data, functionOnClick) {
-    var dropdownElHtmlDivider = $('#label_item_menu_template_1').html();
-    var dropdownElHtml = $('#label_item_menu_template_0').html();
+function fillDropdownLabel(data) {
+    var dropdownElHtmlDivider = $('#item_menu_template_1').html();
+    var dropdownElHtml = $('#item_menu_template_0').html();
+
+
     for (var j = 0; j < data.length; j++) {
         var newSdropdownElHtml = (j > 0) ? $(dropdownElHtmlDivider) : $(dropdownElHtml);
         newSdropdownElHtml.attr('data-id', data[j].id);
-        newSdropdownElHtml.on('click', functionOnClick);
         newSdropdownElHtml.find('strong').prepend(data[j].text);
         $(newSdropdownElHtml).find('strong').css('font-size', '17px');
 
-        ulElemnt.append(newSdropdownElHtml);
+        newSdropdownElHtml.find('a').on('click', function (event) {
+            var $target = $(event.currentTarget);
+            var val = $(this).parent('li').attr('data-id');
+            var $inp = $target.find('input');
+            
+            if ((selectedLabelsId.indexOf(val)) > -1) {
+                if (selectedLabelsId.length===1) {
+                    return false;
+                }
+                removeA(selectedLabelsId,val);
+                $inp.prop('checked', false);
+            } else {
+                selectedLabelsId.push(val);
+                $inp.prop('checked', true);
+            }
+            
+            setSelectedLabel(selectedLabelsId, function() {
+                refreshData();
+            }); 
+            
+            $(event.target).blur();
+
+            return false;
+        });        
+
+        $('#sch_labels').append(newSdropdownElHtml);
     }
 }
 
@@ -55,4 +78,15 @@ function getSelectizeLabels(form) {
         sel = selectizeMobile;
     }
     return sel;
+}
+
+
+function showLabels() {
+    showTasksWrapper();
+    hideCalendarWrapper();
+    deselectProjectMenu();
+
+    selectedView = 'labels';
+    setGroupAndSort();
+    refreshData();
 }

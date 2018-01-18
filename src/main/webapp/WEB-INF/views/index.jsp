@@ -63,6 +63,11 @@
 
                         </ul>                        
                     </li>
+                    <li>
+                        <a href="#" class="btn" role="button" id="showLabels">
+                            <i class="fa fa-gg fa-fw"></i>
+                        </a> 
+                    </li>  
 
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown" href="#">
@@ -197,17 +202,17 @@
 
 
         <script src="resources/main.js?1118"></script>
-        <script src="resources/dbmng.js?1122"></script>
+        <script src="resources/dbmng.js?1123"></script>
         <script src="resources/index.js?1593"></script>
         <script src="resources/indexDateTimePicker.js?1574"></script>
         <script src="resources/indexEditLink.js?1574"></script>
-        <script src="resources/indexEditTaskLabels.js?1574"></script>
+        <script src="resources/indexEditTaskLabels.js?1575"></script>
         <script src="resources/indexEditTaskParent.js?1574"></script>
         <script src="resources/indexEditTaskProjects.js?1574"></script>
         <script src="resources/indexGroupAndSort.js?1575"></script>
         <script src="resources/indexProjectsMenu.js?1574"></script>        
         <script src="resources/indexTaskLists.js?1574"></script>
-        <script src="resources/indexCalendars.js?1575"></script>
+        <script src="resources/indexCalendars.js?1576"></script>
 
     </body>
 </html>

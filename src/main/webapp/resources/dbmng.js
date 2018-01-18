@@ -8,9 +8,6 @@ $(document).ready(function () {
 });
 
 function errorMessage(xhr) {
-    if (xhr.responseText.indexOf("action='/WebSchedule/login'")) {
-        window.location.href = '/WebSchedule/login';
-    }
     $('#error_Modal').find('.modal-title').text('status = ' + xhr.status + '; status text = ' + xhr.statusText);
     $('#error_Modal').find('.modal-body').html(xhr.responseText);
     $('#error_Modal_Button').click();
@@ -152,7 +149,6 @@ function setSelectedCalendar(selectedC, callback) {
     jQuery.ajax({
         type: "PUT",
         url: '/WebSchedule/setSelectedCalendar' + _csrf + selectedC_p,
-        dataType: "json",
         success: function (result) {
             callback(result);
         },
@@ -213,11 +209,10 @@ function loadTasksByProjectByGroup(project_id, callback) {
     });
 }
 
-function loadTasksByLabel(label_id, callback) {
+function loadTasksByLabel(callback) {    
     jQuery.ajax({
         type: "GET",
         url: '/WebSchedule/loadTasksByLabel',
-        data: "id=" + label_id,
         dataType: "json",
         success: function (result) {
             callback(result);
@@ -621,6 +616,30 @@ function deleteLabel(id, callback) {
         }
     });
 }
+
+
+function setSelectedLabel(selectedC, callback) {
+    var selectedC_p = '';
+    for(var i=0; i<selectedC.length; i++) {
+        selectedC_p = selectedC_p + '&ids=' + selectedC[i];
+    }
+    
+    jQuery.ajax({
+        type: "PUT",
+        url: '/WebSchedule/setSelectedLabel' + _csrf + selectedC_p,
+        success: function (result) {
+            callback(result);
+        },
+        error: function (xhr) {
+            errorMessage(xhr);
+        }
+    });
+}
+
+
+
+
+
 
 function saveOrUpdateGS(gs_data, callback) {
     jQuery.ajax({

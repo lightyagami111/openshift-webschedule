@@ -7,7 +7,7 @@ package com.webschedule.design.services;
 
 import ch.lambdaj.Lambda;
 import com.webschedule.design.datastructure.CalendarUIEventDTO;
-import com.webschedule.design.datastructure.EventException;
+import com.webschedule.design.datastructure.EventExceptionEntity;
 import com.webschedule.design.datastructure.TaskEntity;
 import com.webschedule.design.datastructure.TaskRepeatDataEntity;
 import java.util.ArrayList;
@@ -44,7 +44,7 @@ public class RepeatableService {
         List<CalendarUIEventDTO> list1 = new ArrayList<>();
 
         TaskEntity f = rep.getTask();
-        List<Date> eventExceptions = Lambda.extract(rep.getEventsEx(), Lambda.on(EventException.class).getDateException());
+        List<Date> eventExceptions = Lambda.extract(rep.getEventsEx(), Lambda.on(EventExceptionEntity.class).getDateException());
 
 
         Date now = calculateNextInitial(rep.getMode_start(), rep);
@@ -66,7 +66,7 @@ public class RepeatableService {
 
     public CalendarUIEventDTO computeNextFire(TaskRepeatDataEntity rep) {
         TaskEntity f = rep.getTask();
-        List<Date> eventExceptions = Lambda.extract(rep.getEventsEx(), Lambda.on(EventException.class).getDateException());
+        List<Date> eventExceptions = Lambda.extract(rep.getEventsEx(), Lambda.on(EventExceptionEntity.class).getDateException());
 
         Date now = calculateNextInitial(rep.getMode_start(), rep);
         int count = 0;

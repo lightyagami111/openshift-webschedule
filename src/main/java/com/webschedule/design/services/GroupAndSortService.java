@@ -36,6 +36,9 @@ public class GroupAndSortService {
     }
     
     public GroupSortEntity getExistingOrDefault(String view, String id) {
+        if ("labels".equals(view)) {
+            id = "labels";
+        }
         GroupSortEntity selectedGS = daoService.findGSBySelectedViewAndId(view, id);
         if (selectedGS == null) {
             selectedGS = new GroupSortEntity();

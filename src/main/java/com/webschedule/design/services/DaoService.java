@@ -7,7 +7,7 @@ package com.webschedule.design.services;
 
 import ch.lambdaj.Lambda;
 import com.webschedule.design.datastructure.CalendarEntity;
-import com.webschedule.design.datastructure.EventException;
+import com.webschedule.design.datastructure.EventExceptionEntity;
 import com.webschedule.design.datastructure.GroupSortEntity;
 import com.webschedule.design.datastructure.LabelEntity;
 import com.webschedule.design.datastructure.LinkEntity;
@@ -209,6 +209,14 @@ public class DaoService {
         }
         return p;
     }
+    
+    public List<LabelEntity> findLabelById(List<Long> ids) {
+        return getCurrentSession().createQuery("SELECT p FROM LabelEntity p WHERE p.id IN (:_id)").setParameterList("_id", ids).list();
+    }
+    
+    public List<LabelEntity> findSelectedLabels() {
+        return getCurrentSession().createQuery("SELECT ce FROM LabelEntity ce WHERE ce.selected = true").list();
+    }
 
     public void updateLabel(LabelEntity p) {
         getCurrentSession().merge(p);
@@ -257,8 +265,8 @@ public class DaoService {
         return (Long) getCurrentSession().createQuery("SELECT COUNT(*) FROM TaskEntity p WHERE p.project.id = :_id").setParameter("_id", project_id).uniqueResult();
     }
 
-    public List<TaskEntity> loadTaskByLabel(Long label_id) {
-        return getCurrentSession().createQuery("SELECT p FROM TaskEntity p JOIN p.labels pl WHERE pl.id = :_id").setParameter("_id", label_id).list();
+    public List<TaskEntity> loadTaskByLabel(List<Long> label_id) {
+        return getCurrentSession().createQuery("SELECT p FROM TaskEntity p JOIN p.labels pl WHERE pl.id IN (:_id) ").setParameterList("_id", label_id).list();
     }
 
     public List<TaskEntity> findAllSubtasks(String parent_id) {
@@ -314,7 +322,7 @@ public class DaoService {
     public void deleteCurrentEvent(Long task_id, Date date) {
         TaskRepeatDataEntity rep = findRepeatDataByTaskId(task_id);
         if (rep != null) {
-            EventException ee = new EventException();
+            EventExceptionEntity ee = new EventExceptionEntity();
             ee.setTaskRepeatDataEntity(rep);
             ee.setDateException(date);
             save(ee);
@@ -334,11 +342,11 @@ public class DaoService {
         deleteDateData(task_id);
     }
 
-    public void save(EventException ee) {
+    public void save(EventExceptionEntity ee) {
         getCurrentSession().save(ee);
     }
 
-    public List<EventException> findEventExceptions(TaskRepeatDataEntity te) {
+    public List<EventExceptionEntity> findEventExceptions(TaskRepeatDataEntity te) {
         return getCurrentSession().createQuery("SELECT e FROM EventException e WHERE e.taskRepeatDataEntity.id = :_id")
                 .setParameter("_id", te.getId())
                 .list();

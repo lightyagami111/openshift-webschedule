@@ -26,6 +26,8 @@ public class LabelEntity implements Serializable {
     @NotNull
     @Length(max = 255)
     private String text;
+    
+    private Boolean selected = false;
 
     public Long getId() {
         return id;
@@ -41,6 +43,14 @@ public class LabelEntity implements Serializable {
 
     public void setText(String text) {
         this.text = text;
+    }
+    
+    public Boolean getSelected() {
+        return selected;
+    }
+
+    public void setSelected(Boolean selected) {
+        this.selected = selected;
     }
     
     

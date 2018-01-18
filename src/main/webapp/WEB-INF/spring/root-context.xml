@@ -23,24 +23,4 @@
     -->
     <beans:bean id="requestDataValueProcessor" class="org.springframework.security.web.servlet.support.csrf.CsrfRequestDataValueProcessor"/>
         
-    <beans:bean id="myAuthenticationSuccessHandler" class="com.webschedule.design.services.MySimpleUrlAuthenticationSuccessHandler" />
-    
-    <http auto-config="true" >
-        <intercept-url pattern="/**" access="hasRole('ADMIN')" />
-        <form-login login-processing-url="/" authentication-success-handler-ref="myAuthenticationSuccessHandler"/>
-        <logout logout-success-url="/WebSchedule/login" />
-    </http>
-    
-    <beans:bean id="encoder" class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder">
-        <beans:constructor-arg name="strength" value="8" />
-    </beans:bean>
-  
-    <authentication-manager >
-        <authentication-provider>
-            <password-encoder ref="encoder" />
-            <user-service>
-                <user name="websch" password="$2a$10$xY0wSYY7ScnC/ymOnjdGFuQVtFHiePx3mAoHBdoPOBxiE/1G/NmUG" authorities="ROLE_ADMIN" />                
-            </user-service>
-        </authentication-provider>
-    </authentication-manager>
 </beans:beans>

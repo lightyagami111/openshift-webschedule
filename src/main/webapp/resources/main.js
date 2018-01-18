@@ -50,7 +50,7 @@ function refreshData() {
         loadTasksByProjectByGroup(selectedValue, refreshTasksListsCallback);
     }
     else if (selectedView === 'labels') {
-        loadTasksByLabel(selectedValue, refreshTasksListsCallback);
+        loadTasksByLabel(refreshTasksListsCallback);
     }
     else if (selectedView === 'search') {
         loadTasksBySearch(selectedValue, refreshTasksListsCallback);

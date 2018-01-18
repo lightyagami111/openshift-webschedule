@@ -25,26 +25,13 @@
     </div>
 
 
-
-    <div id="label_item_menu_template_0">
-        <li>
-            <a href="#"><div><strong>&nbsp;</strong></div></a>
-        </li>        
-    </div>
-    <div id="label_item_menu_template_1">
-        <li class="divider"></li>
-        <li>
-            <a href="#"><div><strong>&nbsp;</strong></div></a>
-        </li>        
-    </div>
-
     
-    <div id="calendar_item_menu_template_0">
+    <div id="item_menu_template_0">
         <li>
             <a href="#"><input type="checkbox"/>&nbsp;<strong></strong></a>
         </li>        
     </div>
-    <div id="calendar_item_menu_template_1">
+    <div id="item_menu_template_1">
         <li class="divider"></li>
         <li>
             <a href="#"><input type="checkbox"/>&nbsp;<strong></strong></a>

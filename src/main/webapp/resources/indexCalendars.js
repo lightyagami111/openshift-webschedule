@@ -8,14 +8,21 @@ function loadCalendarsAjaxCallback(data_calendars) {
     }
     $('.task_cal').append(option);
 
-    fillDropdownCalendar($('#selectedCalendars'), data_calendars);
+    fillDropdownCalendar(data_calendars);
+    
+    fullCalendarOptions();
+    
+    $('#showCalendar').on('click', function() {
+        showCalendarWrapper();
+        refreshData();
+    });
 }
 
 
-function fillDropdownCalendar(ulElemnt, data) {
+function fillDropdownCalendar(data) {
     
-    var dropdownElHtmlDivider = $('#calendar_item_menu_template_1').html();
-    var dropdownElHtml = $('#calendar_item_menu_template_0').html();
+    var dropdownElHtmlDivider = $('#item_menu_template_1').html();
+    var dropdownElHtml = $('#item_menu_template_0').html();
     
     for (var j = 0; j < data.length; j++) {
         var newSdropdownElHtml = (j > 0) ? $(dropdownElHtmlDivider) : $(dropdownElHtml);
@@ -57,7 +64,7 @@ function fillDropdownCalendar(ulElemnt, data) {
             newSdropdownElHtml.find('input').prop('checked', true);
         }
 
-        ulElemnt.append(newSdropdownElHtml);
+        $('#selectedCalendars').append(newSdropdownElHtml);
     }
 }
 
@@ -127,12 +134,6 @@ function fullCalendarOptions() {
         $('.fc-left h2').before('<br>');
     }
 
-
-    $('#showCalendar').on('click', function() {
-        showCalendarWrapper();
-        refreshData();
-    });
-
 }
 
 
@@ -150,5 +151,4 @@ function showCalendarWrapper() {
     selectedView = 'calendar';
     selectedValue = startD + ' - ' + endD;
     $('#calendar').fullCalendar('option', 'contentHeight', "auto");
-
 }

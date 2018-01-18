@@ -58,7 +58,7 @@ public class TaskRepeatDataEntity implements Serializable {
     
     @OneToMany(fetch = FetchType.EAGER)
     @JsonIgnore
-    private List<EventException> eventsEx;
+    private List<EventExceptionEntity> eventsEx;
 
     public Long getId() {
         return id;
@@ -188,11 +188,11 @@ public class TaskRepeatDataEntity implements Serializable {
         this.allDay = allDay;
     }
 
-    public List<EventException> getEventsEx() {
+    public List<EventExceptionEntity> getEventsEx() {
         return eventsEx;
     }
 
-    public void setEventsEx(List<EventException> eventsEx) {
+    public void setEventsEx(List<EventExceptionEntity> eventsEx) {
         this.eventsEx = eventsEx;
     }
     
